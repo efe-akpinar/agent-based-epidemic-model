@@ -1,8 +1,9 @@
+import itertools
 import random
 
 import pytest
 
-from epidemic_abm import LRTI, MEV1, URTI, day_parameters, daily_parameters
+from epidemic_abm import LRTI, MEV1, URTI, SYMPTOMS, day_parameters, daily_parameters
 
 # Tables 2-4 of the report: (beta_combined, beta_SIR, zeta_raw, zeta_net, gamma_SIR) per symptom set.
 # beta_SIR is None where a beta-minus symptom makes it a random draw.
@@ -66,3 +67,19 @@ def test_unknown_symptom_is_rejected():
 def test_timeline_must_start_on_day_zero():
     with pytest.raises(ValueError):
         daily_parameters({2: ("Cough",)}, random.Random(0))
+
+
+def test_a_neutral_symptom_no_longer_cancels_transmission():
+    cough = day_parameters(["Cough"], random.Random(0)).beta_sir
+    for extra in ("Fever", "Muscle Pain", "Diarrhea"):
+        assert day_parameters(["Cough", extra], random.Random(0)).beta_sir >= cough
+
+
+def test_adding_a_non_beta_minus_symptom_never_lowers_transmission():
+    mild = [name for name, s in SYMPTOMS.items() if not s.beta_minus]
+    for size in range(1, len(mild)):
+        for base in itertools.combinations(mild, size):
+            before = day_parameters(base, random.Random(0)).beta_sir
+            for extra in mild:
+                if extra not in base:
+                    assert day_parameters(base + (extra,), random.Random(0)).beta_sir >= before, (base, extra)

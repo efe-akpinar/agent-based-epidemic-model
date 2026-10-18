@@ -130,7 +130,10 @@ def day_parameters(symptoms: Sequence[str], rng: random.Random) -> DayParameters
         system = graph.nodes[n]["system"]
         degree = degrees[n]
         system_share = degree / beta_defined_per_system[system]
-        beta_scaled[n] = round(beta_raw * (degree / max_degree + ALPHA * system_share), 4)
+        # Network scaling amplifies a symptom's transmissibility but never suppresses it, so a
+        # symptom without same-system partners keeps its raw value instead of dropping to zero.
+        scaling = max(1.0, degree / max_degree + ALPHA * system_share)
+        beta_scaled[n] = round(beta_raw * scaling, 4)
 
     # Synergy scaling and the bounded transmission rate; beta-minus symptoms override it.
     beta_minus = any(SYMPTOMS[s].beta_minus for s in symptoms)
