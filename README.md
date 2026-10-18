@@ -210,4 +210,16 @@ The calibration step downloads the 1978 outbreak data automatically on first use
 
 To model a different disease, define a `Scenario` with a symptom timeline (day of illness → symptoms) and an immunity mix, and pass it to `run_scenario` with a `SimulationConfig`. The app's "Custom symptom timeline" preset does the same interactively.
 
-Built as a team project (team of 3).
+## Project history and credits
+
+- **v1.0.0 — team project (team of 3).** Ata Göktuğ Çim, Efe Akpınar and Ahmet Tuna Kuran developed the symptom-based model and wrote the [report](docs/symptom_based_epidemic_model_report.pdf). Version 1.0.0 implements the report's model and reproduces its three scenarios.
+- **v2.0.0 — individual extension by Efe Akpınar.** Everything beyond the report:
+  - the symptom-engine fix;
+  - infection-chain tracking and measured reproduction numbers;
+  - stochastic disease progression;
+  - ensembles and sensitivity analysis;
+  - calibration to the 1978 boarding-school outbreak;
+  - the planning experiments;
+  - the Streamlit app.
+
+The two versions are tagged in git. [CHANGELOG.md](CHANGELOG.md) lists the changes.
