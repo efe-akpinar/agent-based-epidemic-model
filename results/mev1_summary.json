@@ -1,0 +1,117 @@
+{
+  "scenario": "MeV-1-like high-lethality infection",
+  "agents": 15000,
+  "days": 150,
+  "seed": 42,
+  "ever_infected": 1581,
+  "attack_rate": 0.1054,
+  "peak_infected": 1572,
+  "peak_day": 4,
+  "final": {
+    "S": 13419,
+    "I": 481,
+    "R": 0,
+    "D": 1100
+  },
+  "case_fatality": 0.6958,
+  "r0_start": 1.527,
+  "r0_peak": 1.527,
+  "r0_peak_day": 0,
+  "r0_below_one_day": 3,
+  "epidemic_day": 2,
+  "normalization_day": 127,
+  "peak_hospital_occupancy": 560,
+  "max_turned_away": 991,
+  "recovery_days_by_immunity": {
+    "strong": null,
+    "normal": null,
+    "weak": null
+  },
+  "deaths_by_immunity": {
+    "strong": 170,
+    "normal": 748,
+    "weak": 182
+  },
+  "survival_at_end": {
+    "all": 0.3018,
+    "home": 0.0,
+    "hospital": 0.3691,
+    "severe": 0.3018,
+    "ICU": 0.3805,
+    "general ward": 0.3669
+  },
+  "group_sizes": {
+    "all": 1581,
+    "home": 288,
+    "hospital": 1293,
+    "severe": 1581,
+    "ICU": 189,
+    "general ward": 1104
+  },
+  "logrank_hospital_vs_home": {
+    "chi2": 749.51,
+    "p_value": 5.11973121817542e-165
+  },
+  "config": {
+    "n_agents": 15000,
+    "k_neighbors": 8,
+    "rewire_prob": 0.1,
+    "initial_infected": 0.03,
+    "n_tables": 500,
+    "max_seats": 6,
+    "hospital_beds": 300,
+    "icu_share": 0.2,
+    "pandemic_beds": 200,
+    "surge_factor": 1.2,
+    "death_rate": 0.02,
+    "isolation_group_max": 3,
+    "seed": 42
+  },
+  "parameters": [
+    {
+      "day": 0,
+      "symptoms": "Cough, Fever, Runny Nose",
+      "beta_combined": 1.5696,
+      "beta_sir": 0.6108,
+      "zeta_raw": 1.092,
+      "zeta_net": 0.7904,
+      "gamma_sir": 0.4
+    },
+    {
+      "day": 1,
+      "symptoms": "Cough, Fever, Runny Nose",
+      "beta_combined": 1.5696,
+      "beta_sir": 0.6108,
+      "zeta_raw": 1.092,
+      "zeta_net": 0.7904,
+      "gamma_sir": 0.4
+    },
+    {
+      "day": 2,
+      "symptoms": "High Fever, Muscle Pain",
+      "beta_combined": 0.0,
+      "beta_sir": 0.0036,
+      "zeta_raw": 0.806,
+      "zeta_net": 0.7518,
+      "gamma_sir": 0.1967
+    },
+    {
+      "day": 3,
+      "symptoms": "Loss of Consciousness, Fever, Muscle Pain",
+      "beta_combined": 0.0,
+      "beta_sir": 0.0011,
+      "zeta_raw": 1.9314,
+      "zeta_net": 1.7242,
+      "gamma_sir": 0.005
+    },
+    {
+      "day": 4,
+      "symptoms": "Coma, Sepsis",
+      "beta_combined": 0.0,
+      "beta_sir": 0.0021,
+      "zeta_raw": 1.967,
+      "zeta_net": 1.9283,
+      "gamma_sir": 0.0022
+    }
+  ]
+}

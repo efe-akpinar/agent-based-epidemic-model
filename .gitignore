@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data, model weights and indexes
+data/
+*.csv
+*.zip
+*.npy
+*.pkl
+*.bin
+*.pt
+*.pth
+*.safetensors
+*.ckpt
+checkpoint-*/
+*.faiss
+
+# OS and editor files
+.DS_Store
+__MACOSX/
+.vscode/
+.idea/
+
+# Local tooling
+.claude/
+CLAUDE.md
+
+# Test and packaging caches
+.pytest_cache/
+*.egg-info/
+build/

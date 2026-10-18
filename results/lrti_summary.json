@@ -1,0 +1,162 @@
+{
+  "scenario": "Lower respiratory tract infection",
+  "agents": 15000,
+  "days": 200,
+  "seed": 42,
+  "ever_infected": 11539,
+  "attack_rate": 0.7693,
+  "peak_infected": 8515,
+  "peak_day": 8,
+  "final": {
+    "S": 3461,
+    "I": 525,
+    "R": 6094,
+    "D": 4920
+  },
+  "case_fatality": 0.4264,
+  "r0_start": 1.716,
+  "r0_peak": 1.716,
+  "r0_peak_day": 0,
+  "r0_below_one_day": null,
+  "epidemic_day": 6,
+  "normalization_day": 197,
+  "peak_hospital_occupancy": 560,
+  "max_turned_away": 4652,
+  "recovery_days_by_immunity": {
+    "strong": {
+      "n": 2618,
+      "min": 5,
+      "q1": 5.0,
+      "median": 5.0,
+      "q3": 5.0,
+      "max": 193
+    },
+    "normal": {
+      "n": 3123,
+      "min": 5,
+      "q1": 5.0,
+      "median": 5.0,
+      "q3": 5.0,
+      "max": 192
+    },
+    "weak": {
+      "n": 353,
+      "min": 5,
+      "q1": 5.0,
+      "median": 5.0,
+      "q3": 6.0,
+      "max": 142
+    }
+  },
+  "deaths_by_immunity": {
+    "strong": 1458,
+    "normal": 2609,
+    "weak": 853
+  },
+  "survival_at_end": {
+    "all": 0.5703,
+    "home": 0.65,
+    "hospital": 0.2603,
+    "mild to moderate": 1.0,
+    "severe": 0.1499,
+    "ICU": 0.2042,
+    "general ward": 0.269
+  },
+  "group_sizes": {
+    "all": 11539,
+    "home": 9203,
+    "hospital": 2336,
+    "mild to moderate": 5713,
+    "severe": 5826,
+    "ICU": 303,
+    "general ward": 2033
+  },
+  "logrank_hospital_vs_home": {
+    "chi2": 793.03,
+    "p_value": 1.7642623381231945e-174
+  },
+  "logrank_severe_vs_mild": {
+    "chi2": 9397.72,
+    "p_value": 0.0
+  },
+  "config": {
+    "n_agents": 15000,
+    "k_neighbors": 8,
+    "rewire_prob": 0.1,
+    "initial_infected": 0.03,
+    "n_tables": 500,
+    "max_seats": 6,
+    "hospital_beds": 300,
+    "icu_share": 0.2,
+    "pandemic_beds": 200,
+    "surge_factor": 1.2,
+    "death_rate": 0.02,
+    "isolation_group_max": 3,
+    "seed": 42
+  },
+  "parameters": [
+    {
+      "day": 0,
+      "symptoms": "Cough, Sneezing, Fever",
+      "beta_combined": 2.1888,
+      "beta_sir": 0.6864,
+      "zeta_raw": 1.092,
+      "zeta_net": 0.7904,
+      "gamma_sir": 0.4
+    },
+    {
+      "day": 1,
+      "symptoms": "Cough, Sneezing, Fever",
+      "beta_combined": 2.1888,
+      "beta_sir": 0.6864,
+      "zeta_raw": 1.092,
+      "zeta_net": 0.7904,
+      "gamma_sir": 0.4
+    },
+    {
+      "day": 2,
+      "symptoms": "Cough, Sneezing, Fever",
+      "beta_combined": 2.1888,
+      "beta_sir": 0.6864,
+      "zeta_raw": 1.092,
+      "zeta_net": 0.7904,
+      "gamma_sir": 0.4
+    },
+    {
+      "day": 3,
+      "symptoms": "Sneezing, Cough",
+      "beta_combined": 2.0976,
+      "beta_sir": 0.6772,
+      "zeta_raw": 0.54,
+      "zeta_net": 0.3055,
+      "gamma_sir": 0.5934
+    },
+    {
+      "day": 4,
+      "symptoms": "Sneezing, Cough",
+      "beta_combined": 2.0976,
+      "beta_sir": 0.6772,
+      "zeta_raw": 0.54,
+      "zeta_net": 0.3055,
+      "gamma_sir": 0.5934
+    },
+    {
+      "day": 5,
+      "symptoms": "Sneezing, Cough",
+      "beta_combined": 2.0976,
+      "beta_sir": 0.6772,
+      "zeta_raw": 0.54,
+      "zeta_net": 0.3055,
+      "gamma_sir": 0.5934
+    },
+    {
+      "day": 6,
+      "symptoms": "Pneumonia, Cough, Sneezing, Muscle Pain, High Fever",
+      "beta_combined": 0.0,
+      "beta_sir": 0.0036,
+      "zeta_raw": 3.7336,
+      "zeta_net": 2.172,
+      "gamma_sir": 0.0008
+    }
+  ]
+}

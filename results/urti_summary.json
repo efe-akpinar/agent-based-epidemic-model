@@ -1,0 +1,127 @@
+{
+  "scenario": "Upper respiratory tract infection",
+  "agents": 15000,
+  "days": 30,
+  "seed": 42,
+  "ever_infected": 14997,
+  "attack_rate": 0.9998,
+  "peak_infected": 9932,
+  "peak_day": 9,
+  "final": {
+    "S": 3,
+    "I": 1,
+    "R": 14996,
+    "D": 0
+  },
+  "case_fatality": 0.0,
+  "r0_start": 1.607,
+  "r0_peak": 1.705,
+  "r0_peak_day": 4,
+  "r0_below_one_day": 12,
+  "epidemic_day": null,
+  "normalization_day": null,
+  "peak_hospital_occupancy": 0,
+  "max_turned_away": 0,
+  "recovery_days_by_immunity": {
+    "strong": {
+      "n": 4498,
+      "min": 5,
+      "q1": 5.0,
+      "median": 6.0,
+      "q3": 7.0,
+      "max": 8
+    },
+    "normal": {
+      "n": 8999,
+      "min": 5,
+      "q1": 5.0,
+      "median": 6.0,
+      "q3": 7.0,
+      "max": 8
+    },
+    "weak": {
+      "n": 1499,
+      "min": 5,
+      "q1": 6.0,
+      "median": 7.0,
+      "q3": 8.0,
+      "max": 23
+    }
+  },
+  "deaths_by_immunity": {
+    "strong": 0,
+    "normal": 0,
+    "weak": 0
+  },
+  "config": {
+    "n_agents": 15000,
+    "k_neighbors": 8,
+    "rewire_prob": 0.1,
+    "initial_infected": 0.03,
+    "n_tables": 500,
+    "max_seats": 6,
+    "hospital_beds": 300,
+    "icu_share": 0.2,
+    "pandemic_beds": 200,
+    "surge_factor": 1.2,
+    "death_rate": 0.02,
+    "isolation_group_max": 3,
+    "seed": 42
+  },
+  "parameters": [
+    {
+      "day": 0,
+      "symptoms": "Runny Nose, Sneezing, Muscle Pain",
+      "beta_combined": 1.8,
+      "beta_sir": 0.6429,
+      "zeta_raw": 0.988,
+      "zeta_net": 0.8218,
+      "gamma_sir": 0.4
+    },
+    {
+      "day": 1,
+      "symptoms": "Runny Nose, Sneezing, Muscle Pain",
+      "beta_combined": 1.8,
+      "beta_sir": 0.6429,
+      "zeta_raw": 0.988,
+      "zeta_net": 0.8218,
+      "gamma_sir": 0.4
+    },
+    {
+      "day": 2,
+      "symptoms": "Runny Nose, Sneezing, Muscle Pain",
+      "beta_combined": 1.8,
+      "beta_sir": 0.6429,
+      "zeta_raw": 0.988,
+      "zeta_net": 0.8218,
+      "gamma_sir": 0.4
+    },
+    {
+      "day": 3,
+      "symptoms": "Cough, Runny Nose, Fever, Muscle Pain",
+      "beta_combined": 1.6023,
+      "beta_sir": 0.6157,
+      "zeta_raw": 1.589,
+      "zeta_net": 1.2493,
+      "gamma_sir": 0.3
+    },
+    {
+      "day": 4,
+      "symptoms": "Cough, Runny Nose, Fever, Muscle Pain",
+      "beta_combined": 1.6023,
+      "beta_sir": 0.6157,
+      "zeta_raw": 1.589,
+      "zeta_net": 1.2493,
+      "gamma_sir": 0.3
+    },
+    {
+      "day": 5,
+      "symptoms": "Muscle Pain",
+      "beta_combined": 0.0,
+      "beta_sir": 0.0,
+      "zeta_raw": 0.35,
+      "zeta_net": 0.1891,
+      "gamma_sir": 0.6992
+    }
+  ]
+}
