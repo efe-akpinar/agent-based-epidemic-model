@@ -1,4 +1,4 @@
-"""Figures for a simulation run."""
+"""Figures. Every function returns the figure, or saves it and returns the path when ``path`` is given."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -7,11 +7,13 @@ from typing import Sequence
 import matplotlib
 
 matplotlib.use("Agg")
+import matplotlib.dates as mdates  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
 from matplotlib.ticker import FuncFormatter, MaxNLocator  # noqa: E402
 
-from .analysis import kaplan_meier, survival_frame  # noqa: E402
+from .analysis import kaplan_meier, reproduction_by_cohort, survival_frame  # noqa: E402
 from .model import IMMUNITY_CLASSES, SimulationResult  # noqa: E402
 from .symptoms import SYMPTOMS  # noqa: E402
 
@@ -23,6 +25,9 @@ INK_MUTED = "#898781"
 GRID = "#e1e0d9"
 AXIS = "#c3c2b7"
 SYMPTOM_ORDER = list(SYMPTOMS)
+# Entity colours shared by every chart that shows disease states.
+STATES = [("Susceptible", "S", SERIES[0]), ("Infected", "I", SERIES[1]),
+          ("Recovered", "R", SERIES[2]), ("Dead", "D", SERIES[3])]
 
 plt.rcParams.update({
     "figure.facecolor": SURFACE,
@@ -57,9 +62,13 @@ plt.rcParams.update({
 })
 
 compact = FuncFormatter(lambda v, _: f"{v / 1000:g}K" if abs(v) >= 1000 else f"{v:g}")
+percent = FuncFormatter(lambda v, _: f"{v:.0%}")
 
 
-def _save(fig, path: Path) -> Path:
+def _finish(fig, path: Path | str | None):
+    if path is None:
+        return fig
+    path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path, dpi=150, bbox_inches="tight")
     plt.close(fig)
@@ -76,8 +85,8 @@ def _phase_markers(ax, result: SimulationResult) -> None:
                         ha="right" if near_end else "left", fontsize=8, color=INK_SECONDARY)
 
 
-def _suptitle(fig, text: str) -> None:
-    fig.suptitle(text, x=0.06, y=1.04, ha="left", fontsize=13, fontweight="bold")
+def _suptitle(fig, text: str, y: float = 1.04) -> None:
+    fig.suptitle(text, x=0.06, y=y, ha="left", fontsize=13, fontweight="bold")
 
 
 def _end_labels(ax, x, series: Sequence[tuple[str, Sequence[float]]], min_gap: float) -> None:
@@ -91,13 +100,18 @@ def _end_labels(ax, x, series: Sequence[tuple[str, Sequence[float]]], min_gap: f
             placed.append(y)
 
 
-def plot_sird(result: SimulationResult, path: Path) -> Path:
+def _dot(ax, x, y, color, **kwargs) -> None:
+    ax.plot(x, y, "o", markersize=7, color=color, markeredgecolor=SURFACE, markeredgewidth=1.5, **kwargs)
+
+
+# --------------------------------------------------------------------------- single runs
+def plot_sird(result: SimulationResult, path=None):
     d = result.daily
     fig, (left, right) = plt.subplots(1, 2, figsize=(12.5, 4.2), gridspec_kw={"wspace": 0.5})
-    series = [("Susceptible", d["S"]), ("Infected", d["I"]), ("Recovered", d["R"]), ("Dead", d["D"])]
-    for (label, values), color in zip(series, SERIES):
-        left.plot(d["day"], values, color=color, label=label)
-    _end_labels(left, d["day"].values, [(k, v.values) for k, v in series], min_gap=0.06 * result.config.n_agents)
+    for label, key, color in STATES:
+        left.plot(d["day"], d[key], color=color, label=label)
+    _end_labels(left, d["day"].values, [(label, d[key].values) for label, key, _ in STATES],
+                min_gap=0.06 * result.config.n_agents)
     _phase_markers(left, result)
     left.set_title("Agents by state")
     left.set(xlabel="Day", ylabel="Agents")
@@ -115,28 +129,47 @@ def plot_sird(result: SimulationResult, path: Path) -> Path:
     right.margins(x=0)
     right.legend(loc="upper center", bbox_to_anchor=(0.5, -0.16), ncol=2)
     _suptitle(fig, result.scenario.name)
-    return _save(fig, path)
+    return _finish(fig, path)
 
 
-def plot_r0(result: SimulationResult, path: Path, days: int = 30) -> Path:
-    d = result.daily[result.daily["day"] < days]
+def plot_r0(result: SimulationResult, path=None, days: int = 30):
+    d = result.daily[(result.daily["day"] < days) & result.daily["r0"].notna()]
     peak = d.loc[d["r0"].idxmax()]
     fig, ax = plt.subplots(figsize=(8, 4))
     ax.plot(d["day"], d["r0"], color=SERIES[0])
     ax.axhline(1, color=INK_MUTED, linewidth=1)
     ax.annotate("R0 = 1", (d["day"].iloc[-1], 1), xytext=(0, 4), textcoords="offset points",
                 ha="right", fontsize=8.5, color=INK_SECONDARY)
-    ax.plot(peak["day"], peak["r0"], "o", markersize=8, color=SERIES[0], markeredgecolor=SURFACE, markeredgewidth=2)
+    _dot(ax, peak["day"], peak["r0"], SERIES[0])
     ax.annotate(f"peak {peak['r0']:.2f} (day {int(peak['day'])})", (peak["day"], peak["r0"]),
                 xytext=(8, 6), textcoords="offset points", fontsize=8.5, color=INK_SECONDARY)
     ax.set_title(f"{result.scenario.name}: R0 = mean β / mean γ")
     ax.set(xlabel="Day", ylabel="R0")
     ax.set_ylim(0, max(2.0, peak["r0"] * 1.15))
     ax.margins(x=0.01)
-    return _save(fig, path)
+    return _finish(fig, path)
 
 
-def plot_symptoms(result: SimulationResult, path: Path) -> Path:
+def plot_reproduction(result: SimulationResult, path=None, days: int = 20):
+    """Measured case reproduction number (who infected whom) against the report's beta/gamma ratio."""
+    cohorts = reproduction_by_cohort(result)
+    cohorts = cohorts[(cohorts["infection_day"] < days) & (cohorts["cases"] >= 20)]
+    d = result.daily[(result.daily["day"] < days) & result.daily["r0"].notna()]
+    fig, ax = plt.subplots(figsize=(8.5, 4))
+    ax.plot(cohorts["infection_day"], cohorts["r_case"], color=SERIES[0],
+            label="Measured: secondary infections per case, by day of infection")
+    ax.plot(d["day"], d["r0"], color=SERIES[1], label="Report's R0 = mean β / mean γ")
+    ax.axhline(1, color=INK_MUTED, linewidth=1)
+    ax.set_title(f"{result.scenario.name}: reproduction number")
+    ax.set(xlabel="Day", ylabel="Reproduction number")
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.set_ylim(bottom=0)
+    ax.margins(x=0.01)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.16), ncol=1)
+    return _finish(fig, path)
+
+
+def plot_symptoms(result: SimulationResult, path=None):
     counts = result.symptoms
     columns = [s for s in SYMPTOM_ORDER if s in counts.columns]
     fig, ax = plt.subplots(figsize=(12, 4.2))
@@ -156,10 +189,10 @@ def plot_symptoms(result: SimulationResult, path: Path) -> Path:
     ax.yaxis.set_major_formatter(compact)
     ax.margins(x=0.01)
     ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1), title="Symptom", title_fontsize=9)
-    return _save(fig, path)
+    return _finish(fig, path)
 
 
-def plot_hospital(result: SimulationResult, path: Path) -> Path:
+def plot_hospital(result: SimulationResult, path=None):
     d = result.daily
     units = [("General ward", d["hospital_general"]), ("ICU", d["hospital_icu"]),
              ("Pandemic hospital", d["hospital_pandemic"])]
@@ -170,7 +203,7 @@ def plot_hospital(result: SimulationResult, path: Path) -> Path:
     _phase_markers(load, result)
     load.set_title("Hospital occupancy by unit")
     load.set(xlabel="Day", ylabel="Patients")
-    load.set_ylim(0, d["hospital_capacity"].max() * 1.15)
+    load.set_ylim(0, max(1, d["hospital_capacity"].max()) * 1.15)
     load.margins(x=0)
     load.legend(loc="upper center", bbox_to_anchor=(0.5, -0.16), ncol=4)
 
@@ -182,10 +215,10 @@ def plot_hospital(result: SimulationResult, path: Path) -> Path:
     queue.set_ylim(bottom=0)
     queue.margins(x=0)
     _suptitle(fig, result.scenario.name)
-    return _save(fig, path)
+    return _finish(fig, path)
 
 
-def plot_recovery_times(result: SimulationResult, path: Path) -> Path:
+def plot_recovery_times(result: SimulationResult, path=None):
     a = result.agents[result.agents["outcome"] == "recovered"]
     days = a["outcome_day"] - a["infection_day"]
     groups = [(c, days[a["immunity"] == c].values) for c in IMMUNITY_CLASSES]
@@ -208,10 +241,10 @@ def plot_recovery_times(result: SimulationResult, path: Path) -> Path:
     ax.set_ylabel("Days from infection to recovery")
     ax.set_ylim(0, max(v.max() for _, v in groups) * 1.12)
     ax.grid(axis="x", visible=False)
-    return _save(fig, path)
+    return _finish(fig, path)
 
 
-def plot_survival(result: SimulationResult, path: Path) -> Path:
+def plot_survival(result: SimulationResult, path=None):
     frame = survival_frame(result)
     panels = [
         ("All infected agents", [("All infected", frame)]),
@@ -227,19 +260,18 @@ def plot_survival(result: SimulationResult, path: Path) -> Path:
             ax.fill_between(km["time"], km["lower"], km["upper"], step="post", color=color, alpha=0.12, linewidth=0)
         ax.set_title(title)
         ax.set_ylim(-0.02, 1.04)
-        ax.legend(loc="best")
+        if groups:
+            ax.legend(loc="best")
     for ax in axes[1]:
         ax.set_xlabel("Days since infection")
     for ax in axes[:, 0]:
         ax.set_ylabel("Survival probability")
-    fig.suptitle(f"{result.scenario.name}: Kaplan–Meier survival", x=0.06, ha="left", fontsize=13,
-                 fontweight="bold")
-    return _save(fig, path)
+    _suptitle(fig, f"{result.scenario.name}: Kaplan–Meier survival", y=0.98)
+    return _finish(fig, path)
 
 
-def plot_outcomes(results: Sequence[SimulationResult], path: Path) -> Path:
+def plot_outcomes(results: Sequence[SimulationResult], path=None):
     """Final state of the population in each scenario, as shares of all agents."""
-    # Same entity colours as the SIRD charts: S blue, I orange, R aqua, D yellow.
     states = [("Never infected", "S", SERIES[0]), ("Recovered", "R", SERIES[2]),
               ("Still infected", "I", SERIES[1]), ("Dead", "D", SERIES[3])]
     fig, ax = plt.subplots(figsize=(10, 1.1 + 0.55 * len(results)))
@@ -254,9 +286,184 @@ def plot_outcomes(results: Sequence[SimulationResult], path: Path) -> Path:
                         color="white" if color in (SERIES[0], SERIES[1]) else INK)
         left += shares
     ax.set_xlim(0, 1)
-    ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:.0%}"))
+    ax.xaxis.set_major_formatter(percent)
     ax.grid(axis="y", visible=False)
     ax.tick_params(axis="y", length=0)
     ax.set_title("Population outcome at the end of each scenario")
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=4)
-    return _save(fig, path)
+    return _finish(fig, path)
+
+
+# --------------------------------------------------------------------------- ensembles
+def plot_ensembles(ensembles, path=None):
+    """Median and 90% interval of the SIRD curves across seeds, one panel per scenario."""
+    fig, axes = plt.subplots(1, len(ensembles), figsize=(4.4 * len(ensembles), 4.2), sharey=True,
+                             gridspec_kw={"wspace": 0.12})
+    axes = np.atleast_1d(axes)
+    for ax, ens in zip(axes, ensembles):
+        bands = ens.bands([key for _, key, _ in STATES])
+        for label, key, color in STATES:
+            ax.fill_between(bands.index, bands[(key, 0.05)], bands[(key, 0.95)], color=color, alpha=0.2, linewidth=0)
+            ax.plot(bands.index, bands[(key, 0.5)], color=color, label=label)
+        ax.set_title(ens.scenario.name.replace(" infection", ""), fontsize=11)
+        ax.set_xlabel("Day")
+        ax.margins(x=0)
+        ax.yaxis.set_major_formatter(compact)
+    axes[0].set_ylabel("Agents")
+    axes[0].legend(loc="upper center", bbox_to_anchor=(0.5 * len(ensembles) + 0.06 * (len(ensembles) - 1), -0.16),
+                   ncol=4)
+    n_runs = len(ensembles[0].summaries)
+    _suptitle(fig, f"Median and 90% interval across {n_runs} seeds per scenario", y=1.03)
+    return _finish(fig, path)
+
+
+def plot_progression(fixed, stochastic, path=None):
+    """Severe-stage share and case fatality by immunity class: fixed vs stochastic progression."""
+    def ratio(ens, numerator):
+        return np.array([[s[numerator][c] / max(1, s["infected_by_immunity"][c]) for c in IMMUNITY_CLASSES]
+                         for s in ens.summaries])
+
+    panels = [("Infected agents reaching the severe stage", "severe_by_immunity"),
+              ("Case fatality", "deaths_by_immunity")]
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4), gridspec_kw={"wspace": 0.25})
+    x = np.arange(len(IMMUNITY_CLASSES))
+    for ax, (title, key) in zip(axes, panels):
+        for offset, (label, ens), color in zip((-0.12, 0.12), (("Fixed timeline (report)", fixed),
+                                                             ("Stochastic progression", stochastic)), SERIES):
+            values = ratio(ens, key)
+            low, med, high = np.quantile(values, [0.05, 0.5, 0.95], axis=0)
+            ax.vlines(x + offset, low, high, color=color, linewidth=2)
+            _dot(ax, x + offset, med, color, label=label)
+            for xi, m in zip(x + offset, med):
+                ax.annotate(f"{m:.0%}", (xi, m), xytext=(7, 0), textcoords="offset points", va="center",
+                            fontsize=8, color=INK_SECONDARY)
+        ax.set_xticks(x, [f"{c.capitalize()} immunity" for c in IMMUNITY_CLASSES])
+        ax.set_title(title)
+        ax.set_ylim(0, 1.05)
+        ax.yaxis.set_major_formatter(percent)
+        ax.grid(axis="x", visible=False)
+        ax.set_xlim(-0.5, len(IMMUNITY_CLASSES) - 0.5)
+    axes[0].legend(loc="upper center", bbox_to_anchor=(1.1, -0.12), ncol=2)
+    _suptitle(fig, f"{fixed.scenario.name}: disease course by immunity (median and 90% interval)", y=1.05)
+    return _finish(fig, path)
+
+
+# --------------------------------------------------------------------------- sensitivity
+def plot_morris(indices: pd.DataFrame, path=None, order_by: str = "deaths"):
+    outputs = list(dict.fromkeys(indices["output"]))
+    ranking = indices[indices["output"] == order_by].sort_values("relative")
+    order, labels = ranking["factor"].tolist(), ranking["factor_label"].tolist()
+    y = np.arange(len(order))
+    fig, axes = plt.subplots(1, len(outputs), figsize=(4.2 * len(outputs) + 1.5, 0.36 * len(order) + 1.6),
+                             sharey=True, gridspec_kw={"wspace": 0.08})
+    for ax, output in zip(axes, outputs):
+        g = indices[indices["output"] == output].set_index("factor").loc[order]
+        scale = g["mu_star"].max()
+        ax.barh(y, g["relative"], height=0.42, color=SERIES[0])
+        ax.errorbar(g["relative"], y, xerr=g["mu_star_conf"] / scale, fmt="none", ecolor=INK_SECONDARY,
+                    elinewidth=1, capsize=0)
+        ax.set_title(g["output_label"].iloc[0])
+        ax.set_xlim(0, 1.45)
+        ax.set_xlabel("μ* relative to the largest effect")
+        ax.grid(axis="y", visible=False)
+        ax.tick_params(axis="y", length=0)
+    axes[0].set_yticks(y, labels)
+    _suptitle(fig, "Morris sensitivity of the lower respiratory scenario to settings the report leaves open", y=1.02)
+    return _finish(fig, path)
+
+
+# --------------------------------------------------------------------------- calibration
+def plot_calibration(calibration, sir: dict | None = None, path=None):
+    from .calibration import observation_days, sir_curve
+
+    obs = calibration.observed
+    dates = obs["date"]
+    fig, axes = plt.subplots(1, 2, figsize=(12.5, 4.3), gridspec_kw={"wspace": 0.22}, sharey=True)
+    panels = [("in_bed", "Boys confined to bed (fitted)"), ("convalescent", "Boys convalescing (held out)")]
+    for ax, (column, title) in zip(axes, panels):
+        b = calibration.bands(column)
+        ax.fill_between(dates, b[0.05], b[0.95], color=SERIES[0], alpha=0.18, linewidth=0)
+        ax.plot(dates, b[0.5], color=SERIES[0], label="Agent-based model: median and 90% interval")
+        if column == "in_bed" and sir is not None:
+            curve = sir_curve(sir["beta"], sir["gamma"], sir["t0"], observation_days(obs))
+            ax.plot(dates, curve, color=SERIES[1], label=f"Deterministic SIR fit (R0 = {sir['r0']:.1f})")
+        _dot(ax, dates, obs[column], INK, label="Observed, 1978")
+        ax.set_title(title)
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%d %b"))
+        ax.xaxis.set_major_locator(mdates.DayLocator(interval=3))
+        ax.set_ylim(bottom=0)
+    axes[0].set_ylabel("Boys")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.0), ncol=3, frameon=False,
+               labelcolor=INK_SECONDARY)
+    _suptitle(fig, "Boarding-school influenza, 1978: calibrated model against the observed outbreak", y=1.03)
+    return _finish(fig, path)
+
+
+def plot_posterior(calibration, path=None):
+    from .calibration import PRIORS
+
+    labels = {"beta_scale": "Transmission scale", "latent_days": "Latent days", "prodromal_days": "Prodromal days",
+              "bed_days": "Days in bed", "bed_probability": "Infections confined to bed"}
+    fig, axes = plt.subplots(1, len(PRIORS), figsize=(2.7 * len(PRIORS), 2.8), gridspec_kw={"wspace": 0.35})
+    for ax, (name, prior) in zip(axes, PRIORS.items()):
+        values = calibration.accepted[name]
+        if isinstance(prior, tuple):
+            ax.hist(values, bins=np.linspace(*prior, 13), color=SERIES[0], edgecolor=SURFACE, linewidth=1)
+            ax.set_xlim(*prior)
+        else:
+            counts = values.value_counts().reindex(prior, fill_value=0)
+            ax.bar(counts.index, counts.values, width=0.5, color=SERIES[0])
+            ax.set_xticks(prior)
+        ax.set_title(labels[name], fontsize=10)
+        ax.grid(axis="x", visible=False)
+        ax.tick_params(axis="y", labelsize=8)
+    axes[0].set_ylabel("Accepted draws")
+    _suptitle(fig, f"Approximate posterior: {len(calibration.accepted)} accepted of "
+                   f"{len(calibration.draws):,} prior draws (x-axis = prior range)", y=1.1)
+    return _finish(fig, path)
+
+
+# --------------------------------------------------------------------------- experiments
+def plot_interventions(table: pd.DataFrame, path=None, school_size: int = 763):
+    fig, ax = plt.subplots(figsize=(10, 0.5 * len(table) + 1.4))
+    y = np.arange(len(table))[::-1]
+    ax.hlines(y, table["boys_ill_low"], table["boys_ill_high"], color=SERIES[0], linewidth=2)
+    _dot(ax, table["boys_ill_mean"], y, SERIES[0])
+    ax.axvline(table["boys_ill_mean"].iloc[0], color=INK_MUTED, linewidth=1)
+    for yi, (_, row) in zip(y, table.iterrows()):
+        ax.annotate(f"mean {row['boys_ill_mean']:.0f}  ·  major outbreak in {row['major_outbreak_probability']:.0%} of runs",
+                    (school_size, yi), xytext=(8, 0), textcoords="offset points", va="center", fontsize=8.5,
+                    color=INK_SECONDARY, annotation_clip=False)
+    ax.set_yticks(y, table["intervention"])
+    ax.set_xlim(0, school_size)
+    ax.set_xlabel(f"Boys who fell ill (of {school_size}): mean and 90% interval across posterior draws and seeds")
+    ax.grid(axis="y", visible=False)
+    ax.tick_params(axis="y", length=0)
+    ax.set_title("Interventions in the calibrated boarding-school model")
+    return _finish(fig, path)
+
+
+def plot_capacity(table: pd.DataFrame, path=None):
+    fig, (deaths, attack) = plt.subplots(1, 2, figsize=(12, 4.2), gridspec_kw={"wspace": 0.25})
+    for (policy, group), color in zip(table.groupby("policy", sort=False), SERIES):
+        deaths.fill_between(group["beds_per_1000"], group["deaths_low"], group["deaths_high"], color=color,
+                            alpha=0.18, linewidth=0)
+        deaths.plot(group["beds_per_1000"], group["deaths_median"], color=color, marker="o", markersize=6,
+                    markeredgecolor=SURFACE, label=policy)
+        attack.plot(group["beds_per_1000"], group["attack_rate_median"], color=color, marker="o", markersize=6,
+                    markeredgecolor=SURFACE, label=policy)
+    for ax in (deaths, attack):
+        ax.set_xscale("log")
+        ax.set_xticks(table["beds_per_1000"].unique(), [f"{v:g}" for v in table["beds_per_1000"].unique()])
+        ax.minorticks_off()
+        ax.set_xlabel("Regular hospital beds per 1,000 agents")
+    deaths.set_title("Deaths by day 200 (median and 90% interval)")
+    deaths.set_ylabel("Deaths")
+    deaths.yaxis.set_major_formatter(compact)
+    attack.set_title("Attack rate (median)")
+    attack.yaxis.set_major_formatter(percent)
+    attack.set_ylim(0.6, 1.02)
+    deaths.legend(loc="upper center", bbox_to_anchor=(1.1, -0.16), ncol=2)
+    _suptitle(fig, "Lower respiratory scenario: hospital capacity and the timing of isolation", y=1.04)
+    return _finish(fig, path)
