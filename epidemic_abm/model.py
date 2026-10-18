@@ -1,17 +1,20 @@
 """Agent-based SIRD model with symptom-driven transmission, recovery and mortality.
 
-Each infected agent follows the scenario's symptom timeline by day of illness. Its
-transmission rate, recovery rate and daily health loss come from the symptom-network
-engine, modulated by the agent's immunity class and health reserve. Contacts come from
-a small-world network plus daily cafeteria tables, and severe cases compete for
-hospital beds.
+Each infected agent follows a symptom course by day of illness. Its transmission rate,
+recovery rate and daily health loss come from the symptom-network engine, modulated by
+the agent's immunity class and health reserve. Contacts come from a small-world network
+plus daily cafeteria tables, and severe cases compete for hospital beds.
+
+With ``progression="fixed"`` every agent follows the scenario timeline exactly, as in the
+report. With ``progression="stochastic"`` stage durations vary between agents and only a
+share of agents (depending on immunity) progresses into the severe stage.
 """
 from __future__ import annotations
 
 import math
 import random
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Sequence
 
 import networkx as nx
@@ -33,9 +36,6 @@ HEALTH_BONUS = {
 }
 # Daily health loss that treatment offsets, per care setting.
 TREATMENT_RELIEF = {"home": 4.0, "general": 12.0, "pandemic": 18.0, "icu": 25.0}
-# Health loss per unit of total severity (raw + synergy zeta). 2.5 reproduces the report's
-# single-symptom examples: cough (zeta 0.2) -> 0.5 and fever (zeta 0.3) -> 0.75 per day.
-HEALTH_LOSS_PER_ZETA = 2.5
 # Patients with pneumonia or high fever go to the ICU below these health scores.
 ICU_HEALTH_THRESHOLD = {"strong": 500, "normal": 300, "weak": 120}
 
@@ -43,7 +43,6 @@ CRITICAL_SYMPTOMS = frozenset({"Coma", "Sepsis", "Loss of Consciousness"})
 SEVERE_SYMPTOMS = frozenset({"Pneumonia", "High Fever"})
 RECOVERY_THRESHOLD_RANGE = (1.5, 3.5)
 MIN_RECOVERY_RATE = 0.01
-MIN_ILLNESS_DAYS = 5
 MAX_HEALTH = 1000
 DAILY_HUNGER_INCREMENT = 0.5
 HUNGER_THRESHOLD = 2.0
@@ -54,17 +53,30 @@ MAX_CONTACTS_BETA_MINUS = 3
 @dataclass
 class SimulationConfig:
     n_agents: int = 15_000
-    k_neighbors: int = 8           # small-world neighbours per agent
+    k_neighbors: int = 8               # small-world neighbours per agent
     rewire_prob: float = 0.1
-    initial_infected: float = 0.03
-    n_tables: int = 500            # cafeteria tables
-    max_seats: int = 6             # maximum seats per table
-    hospital_beds: int = 300       # regular capacity (general ward + ICU)
+    initial_infected: float = 0.03     # share of agents infected on day 0
+    initial_cases: int | None = None   # exact number of initial cases (overrides the share)
+    n_tables: int = 500                # cafeteria tables
+    max_seats: int = 6                 # maximum seats per table
+    hospital_beds: int = 300           # regular capacity (general ward + ICU)
     icu_share: float = 0.2
-    pandemic_beds: int = 200       # pandemic hospital opened on the epidemic day (0 = never)
-    surge_factor: float = 1.2      # hospital capacity during the epidemic phase
-    death_rate: float = 0.02       # daily death probability scale for lethal combinations
-    isolation_group_max: int = 3   # largest contact group after the epidemic day
+    pandemic_beds: int = 200           # pandemic hospital opened on the epidemic day (0 = never)
+    surge_factor: float = 1.2          # hospital capacity during the epidemic phase
+    death_rate: float = 0.02           # daily death probability scale for lethal combinations
+    isolation_group_max: int = 3       # largest contact group after the epidemic day
+    # Health loss per unit of total severity (raw + synergy zeta). 2.5 reproduces the report's
+    # single-symptom examples: cough (zeta 0.2) -> 0.5 and fever (zeta 0.3) -> 0.75 per day.
+    health_loss_per_zeta: float = 2.5
+    min_illness_days: int = 5          # earliest day of illness on which an agent can recover
+    beta_scale: float = 1.0            # multiplier on transmission pressure (e.g. masks < 1)
+    # Interventions
+    symptom_isolation: float = 0.0     # daily probability that a symptomatic agent self-isolates
+    isolation_threshold: float | None = None  # start the epidemic phase at this bed occupancy
+    isolation_response: bool = True    # split the contact network into isolation groups in the epidemic phase
+    # Disease course
+    progression: str = "fixed"         # "fixed" (report) or "stochastic"
+    severe_progression: tuple[float, float, float] = (0.3, 0.6, 0.9)  # strong / normal / weak
     seed: int = 42
 
 
@@ -75,8 +87,8 @@ class Stage:
     beta_minus: bool
     critical: bool
     severe: bool
-    lethal: bool        # two or more beta-minus symptoms at once
-    health_loss: float  # before the immunity modifier and treatment relief
+    lethal: bool            # two or more beta-minus symptoms at once
+    latent: bool = False    # infected, not yet infectious or symptomatic
 
     @classmethod
     def from_params(cls, params: DayParameters) -> "Stage":
@@ -88,14 +100,18 @@ class Stage:
             critical=bool(symptoms & CRITICAL_SYMPTOMS),
             severe=bool(symptoms & SEVERE_SYMPTOMS),
             lethal=n_beta_minus >= 2,
-            health_loss=HEALTH_LOSS_PER_ZETA * params.zeta_raw,
         )
+
+
+LATENT = Stage(DayParameters((), 0.0, 0.0, 0.0, 0.0, 0.0), beta_minus=False, critical=False,
+               severe=False, lethal=False, latent=True)
 
 
 class Agent:
     __slots__ = ("id", "immunity", "health", "initial_health", "status", "infection_day",
-                 "outcome_day", "recovery_score", "recovery_threshold", "stage", "hunger",
-                 "unit", "worst_unit", "ever_severe", "ever_critical")
+                 "outcome_day", "recovery_score", "recovery_threshold", "course", "stage", "hunger",
+                 "unit", "worst_unit", "ever_severe", "ever_critical", "isolated", "infector",
+                 "route", "secondary")
 
     def __init__(self, agent_id: int, immunity: str, health: int, hunger: float):
         self.id = agent_id
@@ -107,12 +123,17 @@ class Agent:
         self.outcome_day: int | None = None
         self.recovery_score = 0.0
         self.recovery_threshold = 0.0
+        self.course: Sequence[Stage] = ()
         self.stage: Stage | None = None
         self.hunger = hunger
         self.unit: str | None = None        # current hospital unit
         self.worst_unit: str | None = None  # highest level of care received
         self.ever_severe = False
         self.ever_critical = False
+        self.isolated = False               # self-isolating at home
+        self.infector: int | None = None
+        self.route: str | None = None       # "seed", "network" or "cafeteria"
+        self.secondary = 0                  # agents this agent infected
 
     @property
     def critical(self) -> bool:
@@ -120,8 +141,8 @@ class Agent:
 
     @property
     def present(self) -> bool:
-        """In the community: alive, not hospitalized and able to have social contacts."""
-        return self.status != "D" and self.unit is None and not self.critical
+        """In the community: alive, not hospitalized or isolating, able to have social contacts."""
+        return self.status != "D" and self.unit is None and not self.critical and not self.isolated
 
 
 @dataclass
@@ -134,6 +155,7 @@ class SimulationResult:
     agents: pd.DataFrame
     epidemic_day: int | None
     normalization_day: int | None
+    extra: dict = field(default_factory=dict)
 
 
 class Simulation:
@@ -141,10 +163,16 @@ class Simulation:
         self.scenario = scenario
         self.config = config or SimulationConfig()
         cfg = self.config
+        if cfg.progression not in ("fixed", "stochastic"):
+            raise ValueError("progression must be 'fixed' or 'stochastic'")
         self.rng = random.Random(cfg.seed)
 
         self.days = daily_parameters(scenario.timeline, self.rng)
         self.stages = [Stage.from_params(p) for p in self.days]
+        self.fixed_course = [LATENT] * scenario.latent_days + self.stages
+        starts = sorted(scenario.timeline)
+        self.segments = [(self.stages[d], (starts[i + 1] - d) if i + 1 < len(starts) else None)
+                         for i, d in enumerate(starts)]
 
         counts = [round(share * cfg.n_agents) for share in scenario.immunity_mix[:2]]
         counts.append(cfg.n_agents - sum(counts))
@@ -167,15 +195,35 @@ class Simulation:
         self.normalization_day: int | None = None
 
     # ---------------------------------------------------------------- disease course
-    def stage_for(self, illness_day: int) -> Stage:
-        return self.stages[min(illness_day, len(self.stages) - 1)]
+    def stochastic_course(self, agent: Agent) -> list[Stage]:
+        """Stage durations vary around the timeline; the severe stage is entered with a probability
+        that depends on immunity, otherwise the agent stays in its last mild stage until recovery."""
+        rng = self.rng
+        course: list[Stage] = []
+        if self.scenario.latent_days:
+            course += [LATENT] * (1 + poisson(rng, self.scenario.latent_days - 1))
+        gated = False
+        p_severe = dict(zip(IMMUNITY_CLASSES, self.config.severe_progression))[agent.immunity]
+        for stage, duration in self.segments:
+            if stage.beta_minus and not gated:
+                gated = True
+                if any(not s.latent for s in course) and rng.random() >= p_severe:
+                    break
+            if duration is None:
+                course.append(stage)
+                break
+            course += [stage] * (1 + poisson(rng, duration - 1))
+        return course
 
-    def infect(self, agent: Agent, day: int) -> None:
+    def infect(self, agent: Agent, day: int, infector: int | None = None, route: str = "seed") -> None:
         agent.status = "I"
         agent.infection_day = day
         agent.recovery_score = 0.0
         agent.recovery_threshold = self.rng.uniform(*RECOVERY_THRESHOLD_RANGE)
-        self.set_stage(agent, self.stages[0])
+        agent.infector, agent.route = infector, route
+        agent.course = self.stochastic_course(agent) if self.config.progression == "stochastic" \
+            else self.fixed_course
+        self.set_stage(agent, agent.course[0])
 
     @staticmethod
     def set_stage(agent: Agent, stage: Stage) -> None:
@@ -184,16 +232,17 @@ class Simulation:
         agent.ever_critical |= stage.critical
 
     def progress(self, agent: Agent, day: int) -> None:
+        cfg = self.config
         illness_day = day - agent.infection_day
-        stage = self.stage_for(illness_day)
+        stage = agent.course[min(illness_day, len(agent.course) - 1)]
         self.set_stage(agent, stage)
 
         relief = TREATMENT_RELIEF[agent.unit or "home"]
-        loss = stage.health_loss * HEALTH_LOSS_MODIFIER[agent.immunity] - relief
+        loss = cfg.health_loss_per_zeta * stage.params.zeta_raw * HEALTH_LOSS_MODIFIER[agent.immunity] - relief
         agent.health = max(0.0, agent.health - max(0.0, loss))
 
         p_death = 1.0 if agent.health <= 0 else (
-            self.config.death_rate * (1 - agent.health / MAX_HEALTH) if stage.lethal else 0.0)
+            cfg.death_rate * (1 - agent.health / MAX_HEALTH) if stage.lethal else 0.0)
         if p_death > 0 and self.rng.random() < p_death:
             agent.status, agent.outcome_day = "D", day
             return
@@ -202,9 +251,15 @@ class Simulation:
         agent.recovery_score += gamma
         p_recovery = (1 - math.exp(-max(gamma, MIN_RECOVERY_RATE))) * RECOVERY_MULTIPLIER[agent.immunity]
         p_recovery *= health_bonus(agent.immunity, agent.health)
-        if (illness_day >= MIN_ILLNESS_DAYS and agent.recovery_score >= agent.recovery_threshold
+        if (illness_day >= cfg.min_illness_days and agent.recovery_score >= agent.recovery_threshold
                 and self.rng.random() < p_recovery):
             agent.status, agent.outcome_day = "R", day
+            agent.isolated = False
+            return
+
+        if cfg.symptom_isolation > 0 and not agent.isolated and stage.params.symptoms \
+                and self.rng.random() < cfg.symptom_isolation:
+            agent.isolated = True
 
     # ---------------------------------------------------------------- hospitals
     def update_hospitals(self, day: int) -> dict[str, int]:
@@ -241,15 +296,21 @@ class Simulation:
                 a.worst_unit = unit
             admissions += 1
 
-        # Epidemic day: hospitals turn patients away while discharges lag behind demand.
-        if self.epidemic_day is None and turned_away > 0 and discharges < len(requests):
+        # Epidemic day: hospitals turn patients away while discharges lag behind demand, or
+        # (optionally) occupancy reaches an early-warning share of regular capacity.
+        saturated = turned_away > 0 and discharges < len(requests)
+        threshold = self.config.isolation_threshold
+        early_warning = threshold is not None and \
+            sum(occupancy.values()) >= threshold * sum(self.base_capacity.values())
+        if self.epidemic_day is None and (saturated or early_warning):
             self.epidemic_day = day
             self.capacity = {
                 "general": round(self.base_capacity["general"] * self.config.surge_factor),
                 "icu": round(self.base_capacity["icu"] * self.config.surge_factor),
                 "pandemic": self.config.pandemic_beds,
             }
-            self.adjacency = self.isolation_groups()
+            if self.config.isolation_response:
+                self.adjacency = self.isolation_groups()
         # Normalization day: no one is turned away and discharges outpace admissions again.
         elif (self.epidemic_day is not None and self.normalization_day is None and day > self.epidemic_day
               and turned_away == 0 and discharges > admissions):
@@ -317,16 +378,16 @@ class Simulation:
                 contacts[a.id] = sorted(keep)
         return contacts
 
-    def transmit(self, day: int, contacts: list[list[int]]) -> int:
+    def transmit(self, day: int, contacts: list[list[int]]) -> Counter:
         agents = self.agents
         infectious = [a.status == "I" and a.present for a in agents]
         # Share of each agent's contacts that are infectious: N_i / d_i.
         infected_share = [sum(infectious[w] for w in c) / len(c) if c else 0.0 for c in contacts]
-        new_cases: set[int] = set()
+        new_cases: dict[int, int] = {}
         for a in agents:
             if not infectious[a.id] or a.stage.params.beta_sir <= 0:
                 continue
-            beta = a.stage.params.beta_sir
+            beta = a.stage.params.beta_sir * self.config.beta_scale
             for v in contacts[a.id]:
                 target = agents[v]
                 if target.status != "S" or v in new_cases:
@@ -334,15 +395,21 @@ class Simulation:
                 pressure = beta * infected_share[v]
                 p = min(1.0, (1 - math.exp(-pressure)) * INFECTION_MULTIPLIER[target.immunity])
                 if self.rng.random() < p:
-                    new_cases.add(v)
+                    new_cases[v] = a.id
+        routes = Counter()
         for v in sorted(new_cases):
-            self.infect(agents[v], day)
-        return len(new_cases)
+            source = new_cases[v]
+            route = "network" if v in self.adjacency[source] else "cafeteria"
+            agents[source].secondary += 1
+            self.infect(agents[v], day, infector=source, route=route)
+            routes[route] += 1
+        return routes
 
     # ---------------------------------------------------------------- main loop
     def run(self) -> SimulationResult:
         cfg = self.config
-        for idx in self.rng.sample(range(cfg.n_agents), int(cfg.n_agents * cfg.initial_infected)):
+        n_initial = cfg.initial_cases if cfg.initial_cases is not None else int(cfg.n_agents * cfg.initial_infected)
+        for idx in self.rng.sample(range(cfg.n_agents), n_initial):
             self.infect(self.agents[idx], 0)
 
         daily_rows, symptom_rows = [], []
@@ -352,7 +419,7 @@ class Simulation:
                     self.progress(a, day)
             hospital = self.update_hospitals(day)
             tables = self.cafeteria_tables()
-            new_cases = self.transmit(day, self.daily_contacts(tables))
+            routes = self.transmit(day, self.daily_contacts(tables))
 
             infected = [a for a in self.agents if a.status == "I"]
             status = Counter(a.status for a in self.agents)
@@ -360,7 +427,13 @@ class Simulation:
             mean_gamma = sum(a.stage.params.gamma_sir for a in infected) / len(infected) if infected else 0.0
             daily_rows.append({
                 "day": day, "S": status["S"], "I": status["I"], "R": status["R"], "D": status["D"],
-                "new_infections": new_cases, "cafeteria_visitors": sum(len(t) for t in tables),
+                "E": sum(a.stage.latent for a in infected),
+                "severe_now": sum(a.stage.beta_minus for a in infected),
+                "post_severe": sum(a.ever_severe and not a.stage.beta_minus for a in infected),
+                "isolated": sum(a.isolated for a in infected),
+                "new_infections": sum(routes.values()),
+                "new_network": routes["network"], "new_cafeteria": routes["cafeteria"],
+                "cafeteria_visitors": sum(len(t) for t in tables),
                 **hospital,
                 "hospital_capacity": sum(self.capacity.values()),
                 "mean_beta": mean_beta, "mean_gamma": mean_gamma,
@@ -392,6 +465,9 @@ class Simulation:
             "worst_unit": a.worst_unit,
             "severe": a.ever_severe,
             "critical": a.ever_critical,
+            "infector": a.infector,
+            "route": a.route,
+            "secondary_infections": a.secondary,
         } for a in self.agents])
 
 
@@ -400,6 +476,17 @@ def health_bonus(immunity: str, health: float) -> float:
         if health > threshold:
             return bonus
     return HEALTH_BONUS[immunity][-1][1]
+
+
+def poisson(rng: random.Random, lam: float) -> int:
+    """Poisson draw (Knuth's method; fine for the small means used for stage durations)."""
+    if lam <= 0:
+        return 0
+    limit, k, product = math.exp(-lam), 0, rng.random()
+    while product > limit:
+        k += 1
+        product *= rng.random()
+    return k
 
 
 def run_scenario(scenario: Scenario, config: SimulationConfig | None = None) -> SimulationResult:

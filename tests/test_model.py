@@ -49,3 +49,39 @@ def test_high_lethality_scenario_allows_no_recovery():
     assert result.daily["R"].iloc[-1] == 0
     assert result.daily["D"].iloc[-1] > 0
     assert summarize(result)["case_fatality"] > 0
+
+
+def test_infection_routes_and_chains_are_consistent(lrti):
+    daily, agents = lrti.daily, lrti.agents
+    assert (daily["new_network"] + daily["new_cafeteria"] == daily["new_infections"]).all()
+    infected = agents[agents["infection_day"].notna()]
+    assert agents["secondary_infections"].sum() == (infected["route"] != "seed").sum()
+    assert set(infected["route"]) <= {"seed", "network", "cafeteria"}
+
+
+def test_latent_period_delays_transmission_and_symptoms():
+    result = run_scenario(replace(URTI, n_days=6, latent_days=2), replace(SMALL, n_agents=600))
+    first = result.daily.iloc[0]
+    assert first["E"] == first["I"] > 0
+    assert result.daily.loc[result.daily["day"] < 2, "new_infections"].sum() == 0
+
+
+def test_stochastic_progression_makes_severe_disease_depend_on_immunity():
+    config = replace(SMALL, n_agents=3_000, progression="stochastic", severe_progression=(0.1, 0.5, 0.95))
+    agents = run_scenario(replace(LRTI, n_days=30), config).agents
+    infected = agents[agents["infection_day"].notna()]
+    severe_share = infected.groupby("immunity")["severe"].mean()
+    assert severe_share["strong"] < severe_share["normal"] < severe_share["weak"]
+
+
+def test_symptom_isolation_reduces_spread():
+    config = replace(SMALL, n_agents=1_000)
+    baseline = run_scenario(URTI, config).daily
+    isolating = run_scenario(URTI, replace(config, symptom_isolation=0.8)).daily
+    assert isolating["isolated"].max() > 0
+    assert isolating["S"].iloc[-1] > baseline["S"].iloc[-1]
+
+
+def test_unknown_progression_mode_is_rejected():
+    with pytest.raises(ValueError):
+        run_scenario(URTI, replace(SMALL, progression="random"))

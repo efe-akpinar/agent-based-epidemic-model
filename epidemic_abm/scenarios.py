@@ -9,9 +9,10 @@ from typing import Mapping
 class Scenario:
     key: str
     name: str
-    timeline: Mapping[int, tuple[str, ...]]     # day of illness -> symptoms from that day on
+    timeline: Mapping[int, tuple[str, ...]]     # day of symptoms -> symptoms from that day on
     immunity_mix: tuple[float, float, float]     # share of strong / normal / weak immunity
     n_days: int
+    latent_days: int = 0                         # infected but not yet infectious or symptomatic
 
 
 URTI = Scenario(

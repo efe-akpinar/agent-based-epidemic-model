@@ -65,6 +65,23 @@ def survival_frame(result: SimulationResult) -> pd.DataFrame:
     return agents
 
 
+def reproduction_by_cohort(result: SimulationResult) -> pd.DataFrame:
+    """Measured case reproduction number: mean secondary infections of the agents infected each day."""
+    infected = result.agents[result.agents["infection_day"].notna()]
+    cohorts = infected.groupby("infection_day")["secondary_infections"].agg(["size", "mean"])
+    return cohorts.rename(columns={"size": "cases", "mean": "r_case"}).reset_index()
+
+
+def early_reproduction_number(result: SimulationResult, susceptible_share: float = 0.9) -> float | None:
+    """Mean secondary infections of agents infected while most of the population was still
+    susceptible, an empirical estimate of R0 that avoids the depletion of susceptibles."""
+    daily = result.daily
+    n = result.config.n_agents
+    early_days = daily.loc[daily["S"] + daily["new_infections"] >= susceptible_share * n, "day"]
+    infected = result.agents[result.agents["infection_day"].isin(early_days)]
+    return float(infected["secondary_infections"].mean()) if len(infected) else None
+
+
 def survival_at_end(frame: pd.DataFrame) -> float:
     return float(kaplan_meier(frame["duration"], frame["event"])["survival"].iloc[-1])
 
@@ -77,8 +94,8 @@ def summarize(result: SimulationResult) -> dict:
     peak = daily.loc[daily["I"].idxmax()]
     # R0 = mean beta / mean gamma is only informative while the outbreak is spreading;
     # once beta-minus symptoms dominate, both rates approach zero and the ratio is noise.
-    early = daily[daily["day"] < 10]
-    r0_peak = early.loc[early["r0"].idxmax()]
+    early = daily[(daily["day"] < 10) & daily["r0"].notna()]
+    r0_peak = early.loc[early["r0"].idxmax()] if len(early) else None
     hospital_load = daily[["hospital_general", "hospital_icu", "hospital_pandemic"]].sum(axis=1)
 
     summary = {
@@ -87,15 +104,20 @@ def summarize(result: SimulationResult) -> dict:
         "days": result.scenario.n_days,
         "seed": result.config.seed,
         "ever_infected": int(len(infected)),
+        "ever_severe": int(infected["severe"].sum()),
+        "peak_severe": int(daily["severe_now"].max()),
         "attack_rate": round(len(infected) / len(agents), 4),
         "peak_infected": int(peak["I"]),
         "peak_day": int(peak["day"]),
         "final": {k: int(daily[k].iloc[-1]) for k in ("S", "I", "R", "D")},
         "case_fatality": round(float((infected["outcome"] == "dead").mean()), 4),
-        "r0_start": round(float(daily["r0"].iloc[0]), 3),
-        "r0_peak": round(float(r0_peak["r0"]), 3),
-        "r0_peak_day": int(r0_peak["day"]),
+        "r0_start": _round(_finite(daily["r0"].iloc[0]), 3),
+        "r0_peak": None if r0_peak is None else round(float(r0_peak["r0"]), 3),
+        "r0_peak_day": None if r0_peak is None else int(r0_peak["day"]),
         "r0_below_one_day": next((int(d) for d, r in zip(daily["day"], daily["r0"]) if r < 1), None),
+        "r_seed_cases": round(float(infected.loc[infected["route"] == "seed", "secondary_infections"].mean()), 3),
+        "r_early": _round(early_reproduction_number(result), 3),
+        "infections_by_route": {k: int(v) for k, v in infected["route"].value_counts().items()},
         "epidemic_day": result.epidemic_day,
         "normalization_day": result.normalization_day,
         "peak_hospital_occupancy": int(hospital_load.max()),
@@ -103,6 +125,9 @@ def summarize(result: SimulationResult) -> dict:
         "recovery_days_by_immunity": {
             c: _describe(recovery_days[recovered["immunity"] == c]) for c in IMMUNITY_CLASSES
         },
+        "infected_by_immunity": {c: int((infected["immunity"] == c).sum()) for c in IMMUNITY_CLASSES},
+        "severe_by_immunity": {c: int(((infected["immunity"] == c) & infected["severe"]).sum())
+                               for c in IMMUNITY_CLASSES},
         "deaths_by_immunity": {
             c: int(((infected["immunity"] == c) & (infected["outcome"] == "dead")).sum()) for c in IMMUNITY_CLASSES
         },
@@ -123,6 +148,14 @@ def summarize(result: SimulationResult) -> dict:
                 statistic, p = logrank_test(ga["duration"], ga["event"], gb["duration"], gb["event"])
                 summary[f"logrank_{name}"] = {"chi2": round(statistic, 2), "p_value": p}
     return summary
+
+
+def _round(value: float | None, digits: int) -> float | None:
+    return None if value is None else round(value, digits)
+
+
+def _finite(value: float) -> float | None:
+    return float(value) if np.isfinite(value) else None
 
 
 def _describe(values: pd.Series) -> dict | None:
