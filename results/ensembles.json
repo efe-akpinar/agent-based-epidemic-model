@@ -1,0 +1,154 @@
+{
+  "urti": {
+    "runs": 50,
+    "attack_rate": {
+      "median": 0.9999,
+      "low": 0.9997,
+      "high": 1.0
+    },
+    "peak_infected": {
+      "median": 10014.0,
+      "low": 9858.05,
+      "high": 10214.0
+    },
+    "peak_day": {
+      "median": 9.0,
+      "low": 9.0,
+      "high": 9.0
+    },
+    "deaths": {
+      "median": 0.0,
+      "low": 0.0,
+      "high": 0.0
+    },
+    "case_fatality": {
+      "median": 0.0,
+      "low": 0.0,
+      "high": 0.0
+    },
+    "r_early": {
+      "median": 1.8980000000000001,
+      "low": 1.8578999999999999,
+      "high": 1.9242
+    },
+    "r_report_peak": {
+      "median": 1.7045,
+      "low": 1.702,
+      "high": 1.708
+    }
+  },
+  "lrti": {
+    "runs": 50,
+    "attack_rate": {
+      "median": 0.76705,
+      "low": 0.756845,
+      "high": 0.782965
+    },
+    "peak_infected": {
+      "median": 8477.0,
+      "low": 8306.55,
+      "high": 8726.25
+    },
+    "peak_day": {
+      "median": 7.0,
+      "low": 7.0,
+      "high": 8.0
+    },
+    "deaths": {
+      "median": 4981.0,
+      "low": 4856.6,
+      "high": 5119.55
+    },
+    "case_fatality": {
+      "median": 0.4323,
+      "low": 0.427345,
+      "high": 0.44071
+    },
+    "r_early": {
+      "median": 2.073,
+      "low": 2.03025,
+      "high": 2.1252
+    },
+    "r_report_peak": {
+      "median": 1.716,
+      "low": 1.716,
+      "high": 1.716
+    }
+  },
+  "mev1": {
+    "runs": 50,
+    "attack_rate": {
+      "median": 0.10385,
+      "low": 0.09884,
+      "high": 0.108175
+    },
+    "peak_infected": {
+      "median": 1550.0,
+      "low": 1476.0,
+      "high": 1611.95
+    },
+    "peak_day": {
+      "median": 3.0,
+      "low": 3.0,
+      "high": 4.0
+    },
+    "deaths": {
+      "median": 1100.0,
+      "low": 1038.7,
+      "high": 1153.1
+    },
+    "case_fatality": {
+      "median": 0.70855,
+      "low": 0.69376,
+      "high": 0.725785
+    },
+    "r_early": {
+      "median": 0.7164999999999999,
+      "low": 0.6968,
+      "high": 0.74855
+    },
+    "r_report_peak": {
+      "median": 1.5434999999999999,
+      "low": 1.527,
+      "high": 2.1602
+    }
+  },
+  "lrti_stochastic": {
+    "runs": 50,
+    "attack_rate": {
+      "median": 0.66,
+      "low": 0.6317699999999999,
+      "high": 0.6765500000000001
+    },
+    "peak_infected": {
+      "median": 7084.5,
+      "low": 6736.5,
+      "high": 7324.65
+    },
+    "peak_day": {
+      "median": 7.0,
+      "low": 7.0,
+      "high": 7.0
+    },
+    "deaths": {
+      "median": 2584.0,
+      "low": 2444.25,
+      "high": 2656.6
+    },
+    "case_fatality": {
+      "median": 0.25975,
+      "low": 0.252315,
+      "high": 0.265455
+    },
+    "r_early": {
+      "median": 2.0755,
+      "low": 2.04535,
+      "high": 2.10465
+    },
+    "r_report_peak": {
+      "median": 1.716,
+      "low": 1.716,
+      "high": 1.716
+    }
+  }
+}

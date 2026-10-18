@@ -1,0 +1,1140 @@
+{
+  "observed_boys_ill": 512,
+  "draws": 5000,
+  "accepted": 100,
+  "priors": {
+    "beta_scale": [
+      0.3,
+      12.0
+    ],
+    "latent_days": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "prodromal_days": [
+      1,
+      2,
+      3
+    ],
+    "bed_days": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "bed_probability": [
+      0.3,
+      1.0
+    ]
+  },
+  "posterior": {
+    "beta_scale": {
+      "low": 4.1010525443782475,
+      "median": 8.249104907686784,
+      "high": 11.39870616079058
+    },
+    "latent_days": {
+      "low": 0.0,
+      "median": 1.0,
+      "high": 2.0
+    },
+    "prodromal_days": {
+      "low": 1.0,
+      "median": 2.0,
+      "high": 3.0
+    },
+    "bed_days": {
+      "low": 3.0,
+      "median": 4.0,
+      "high": 6.0
+    },
+    "bed_probability": {
+      "low": 0.3641743859609235,
+      "median": 0.5005089069679927,
+      "high": 0.792091296404329
+    }
+  },
+  "fit": {
+    "in_bed_rmse": 16.35,
+    "in_bed_coverage_90": 1.0,
+    "convalescent_rmse": 48.11,
+    "convalescent_coverage_90": 0.857,
+    "boys_ill": {
+      "low": 270.8,
+      "median": 369.0,
+      "high": 566.4
+    },
+    "r_early": {
+      "low": 2.625,
+      "median": 3.269,
+      "high": 4.143
+    },
+    "take_off_day": {
+      "low": 3.0,
+      "median": 6.0,
+      "high": 8.0
+    },
+    "observed_take_off_day": 14,
+    "fizzled_share": 0.007
+  },
+  "sir_baseline": {
+    "beta": 1.7892152776168373,
+    "gamma": 0.45549813055086574,
+    "t0": 11.445600837978073,
+    "r0": 3.928040880108584,
+    "in_bed_rmse": 16.01373518955751,
+    "predicted_ever_infected": 746.6649609702484
+  },
+  "predictive_bands": {
+    "in_bed": [
+      {
+        "date": "1978-01-22",
+        "low": 0.0,
+        "median": 3.0,
+        "high": 8.0
+      },
+      {
+        "date": "1978-01-23",
+        "low": 4.0,
+        "median": 12.0,
+        "high": 18.0
+      },
+      {
+        "date": "1978-01-24",
+        "low": 21.0,
+        "median": 33.0,
+        "high": 60.0
+      },
+      {
+        "date": "1978-01-25",
+        "low": 48.0,
+        "median": 92.0,
+        "high": 156.39999999999998
+      },
+      {
+        "date": "1978-01-26",
+        "low": 109.8,
+        "median": 188.0,
+        "high": 265.0
+      },
+      {
+        "date": "1978-01-27",
+        "low": 197.4,
+        "median": 260.0,
+        "high": 319.0
+      },
+      {
+        "date": "1978-01-28",
+        "low": 230.0,
+        "median": 276.0,
+        "high": 327.0
+      },
+      {
+        "date": "1978-01-29",
+        "low": 187.8,
+        "median": 241.0,
+        "high": 300.0
+      },
+      {
+        "date": "1978-01-30",
+        "low": 121.0,
+        "median": 181.0,
+        "high": 247.2
+      },
+      {
+        "date": "1978-01-31",
+        "low": 68.8,
+        "median": 121.0,
+        "high": 188.2
+      },
+      {
+        "date": "1978-02-01",
+        "low": 32.8,
+        "median": 71.0,
+        "high": 132.0
+      },
+      {
+        "date": "1978-02-02",
+        "low": 13.0,
+        "median": 38.0,
+        "high": 82.19999999999999
+      },
+      {
+        "date": "1978-02-03",
+        "low": 4.0,
+        "median": 17.0,
+        "high": 48.19999999999999
+      },
+      {
+        "date": "1978-02-04",
+        "low": 1.0,
+        "median": 7.0,
+        "high": 26.19999999999999
+      }
+    ],
+    "convalescent": [
+      {
+        "date": "1978-01-22",
+        "low": 0.0,
+        "median": 0.0,
+        "high": 1.0
+      },
+      {
+        "date": "1978-01-23",
+        "low": 0.0,
+        "median": 0.0,
+        "high": 2.0
+      },
+      {
+        "date": "1978-01-24",
+        "low": 0.0,
+        "median": 1.0,
+        "high": 5.0
+      },
+      {
+        "date": "1978-01-25",
+        "low": 0.0,
+        "median": 3.0,
+        "high": 12.0
+      },
+      {
+        "date": "1978-01-26",
+        "low": 2.0,
+        "median": 9.0,
+        "high": 30.19999999999999
+      },
+      {
+        "date": "1978-01-27",
+        "low": 8.0,
+        "median": 23.0,
+        "high": 63.19999999999999
+      },
+      {
+        "date": "1978-01-28",
+        "low": 18.0,
+        "median": 45.0,
+        "high": 114.0
+      },
+      {
+        "date": "1978-01-29",
+        "low": 33.8,
+        "median": 68.0,
+        "high": 157.99999999999994
+      },
+      {
+        "date": "1978-01-30",
+        "low": 45.0,
+        "median": 87.0,
+        "high": 182.0
+      },
+      {
+        "date": "1978-01-31",
+        "low": 42.8,
+        "median": 90.0,
+        "high": 164.0
+      },
+      {
+        "date": "1978-02-01",
+        "low": 34.0,
+        "median": 79.0,
+        "high": 152.2
+      },
+      {
+        "date": "1978-02-02",
+        "low": 22.0,
+        "median": 54.0,
+        "high": 135.2
+      },
+      {
+        "date": "1978-02-03",
+        "low": 11.0,
+        "median": 32.0,
+        "high": 101.19999999999999
+      },
+      {
+        "date": "1978-02-04",
+        "low": 6.0,
+        "median": 18.0,
+        "high": 69.0
+      }
+    ]
+  },
+  "observed": [
+    {
+      "date": "1978-01-22",
+      "in_bed": 3,
+      "convalescent": 0
+    },
+    {
+      "date": "1978-01-23",
+      "in_bed": 8,
+      "convalescent": 0
+    },
+    {
+      "date": "1978-01-24",
+      "in_bed": 26,
+      "convalescent": 0
+    },
+    {
+      "date": "1978-01-25",
+      "in_bed": 76,
+      "convalescent": 0
+    },
+    {
+      "date": "1978-01-26",
+      "in_bed": 225,
+      "convalescent": 9
+    },
+    {
+      "date": "1978-01-27",
+      "in_bed": 298,
+      "convalescent": 17
+    },
+    {
+      "date": "1978-01-28",
+      "in_bed": 258,
+      "convalescent": 105
+    },
+    {
+      "date": "1978-01-29",
+      "in_bed": 233,
+      "convalescent": 162
+    },
+    {
+      "date": "1978-01-30",
+      "in_bed": 189,
+      "convalescent": 176
+    },
+    {
+      "date": "1978-01-31",
+      "in_bed": 128,
+      "convalescent": 166
+    },
+    {
+      "date": "1978-02-01",
+      "in_bed": 68,
+      "convalescent": 150
+    },
+    {
+      "date": "1978-02-02",
+      "in_bed": 29,
+      "convalescent": 85
+    },
+    {
+      "date": "1978-02-03",
+      "in_bed": 14,
+      "convalescent": 47
+    },
+    {
+      "date": "1978-02-04",
+      "in_bed": 4,
+      "convalescent": 20
+    }
+  ],
+  "accepted_draws": [
+    {
+      "beta_scale": 7.024296747059544,
+      "latent_days": 1,
+      "prodromal_days": 1,
+      "bed_days": 5,
+      "bed_probability": 0.4063149019124802,
+      "distance": 13.955747275992849
+    },
+    {
+      "beta_scale": 4.107684793471802,
+      "latent_days": 1,
+      "prodromal_days": 1,
+      "bed_days": 5,
+      "bed_probability": 0.42091468307927143,
+      "distance": 17.120631839337726
+    },
+    {
+      "beta_scale": 10.472833346175864,
+      "latent_days": 0,
+      "prodromal_days": 1,
+      "bed_days": 5,
+      "bed_probability": 0.41183250763032087,
+      "distance": 19.020568589533866
+    },
+    {
+      "beta_scale": 9.160151622241324,
+      "latent_days": 0,
+      "prodromal_days": 1,
+      "bed_days": 5,
+      "bed_probability": 0.41001572844188156,
+      "distance": 19.74747651470998
+    },
+    {
+      "beta_scale": 10.522087850225503,
+      "latent_days": 1,
+      "prodromal_days": 2,
+      "bed_days": 5,
+      "bed_probability": 0.4136342499450349,
+      "distance": 20.362485845911973
+    },
+    {
+      "beta_scale": 5.583270272371227,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.6077803540670257,
+      "distance": 20.391886809771606
+    },
+    {
+      "beta_scale": 11.391171910905427,
+      "latent_days": 0,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.5302622497312385,
+      "distance": 20.919646911564893
+    },
+    {
+      "beta_scale": 6.3728816867995155,
+      "latent_days": 1,
+      "prodromal_days": 1,
+      "bed_days": 5,
+      "bed_probability": 0.40853456757331985,
+      "distance": 21.6838534252575
+    },
+    {
+      "beta_scale": 4.774702581619173,
+      "latent_days": 1,
+      "prodromal_days": 1,
+      "bed_days": 6,
+      "bed_probability": 0.3975490904765142,
+      "distance": 21.95071778865476
+    },
+    {
+      "beta_scale": 8.755248603598723,
+      "latent_days": 0,
+      "prodromal_days": 1,
+      "bed_days": 5,
+      "bed_probability": 0.45281982221889666,
+      "distance": 22.062831131011865
+    },
+    {
+      "beta_scale": 7.705154336293297,
+      "latent_days": 0,
+      "prodromal_days": 2,
+      "bed_days": 5,
+      "bed_probability": 0.4375639922954963,
+      "distance": 22.20579255041343
+    },
+    {
+      "beta_scale": 10.420908729420162,
+      "latent_days": 0,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.5364426600324611,
+      "distance": 22.598035025841593
+    },
+    {
+      "beta_scale": 11.519458977843307,
+      "latent_days": 0,
+      "prodromal_days": 2,
+      "bed_days": 4,
+      "bed_probability": 0.5622240319123961,
+      "distance": 22.73215072125807
+    },
+    {
+      "beta_scale": 4.747758017302078,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.6387879618278687,
+      "distance": 23.00140107822156
+    },
+    {
+      "beta_scale": 9.61271774669622,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.5838644712713646,
+      "distance": 23.286702823068055
+    },
+    {
+      "beta_scale": 6.254189087579875,
+      "latent_days": 1,
+      "prodromal_days": 2,
+      "bed_days": 4,
+      "bed_probability": 0.48253008552925164,
+      "distance": 23.30726167096823
+    },
+    {
+      "beta_scale": 6.6806481675695135,
+      "latent_days": 0,
+      "prodromal_days": 3,
+      "bed_days": 3,
+      "bed_probability": 0.7614822373527959,
+      "distance": 23.373360541412595
+    },
+    {
+      "beta_scale": 8.788068672827764,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 5,
+      "bed_probability": 0.506256023207032,
+      "distance": 23.435625842646218
+    },
+    {
+      "beta_scale": 9.983525478739963,
+      "latent_days": 0,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.5722785877358624,
+      "distance": 23.67587117672556
+    },
+    {
+      "beta_scale": 8.07022190648756,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.5378210908369485,
+      "distance": 23.838843787005086
+    },
+    {
+      "beta_scale": 10.721249824143356,
+      "latent_days": 0,
+      "prodromal_days": 1,
+      "bed_days": 4,
+      "bed_probability": 0.4709205029681841,
+      "distance": 23.943525247283606
+    },
+    {
+      "beta_scale": 7.959452787919689,
+      "latent_days": 2,
+      "prodromal_days": 3,
+      "bed_days": 3,
+      "bed_probability": 0.8676580666964134,
+      "distance": 24.200171753950855
+    },
+    {
+      "beta_scale": 5.313014195527729,
+      "latent_days": 0,
+      "prodromal_days": 3,
+      "bed_days": 3,
+      "bed_probability": 0.6761069434184895,
+      "distance": 24.203871939124213
+    },
+    {
+      "beta_scale": 8.149764539336633,
+      "latent_days": 0,
+      "prodromal_days": 1,
+      "bed_days": 4,
+      "bed_probability": 0.49724561103469783,
+      "distance": 24.255222074114638
+    },
+    {
+      "beta_scale": 10.461456437499452,
+      "latent_days": 0,
+      "prodromal_days": 1,
+      "bed_days": 6,
+      "bed_probability": 0.3692603280963097,
+      "distance": 24.344995705024417
+    },
+    {
+      "beta_scale": 11.513104126128951,
+      "latent_days": 2,
+      "prodromal_days": 1,
+      "bed_days": 3,
+      "bed_probability": 0.6987691846995439,
+      "distance": 24.391809918584773
+    },
+    {
+      "beta_scale": 7.468776573800393,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 5,
+      "bed_probability": 0.5824733949326774,
+      "distance": 24.40696349539483
+    },
+    {
+      "beta_scale": 11.392685215246455,
+      "latent_days": 2,
+      "prodromal_days": 2,
+      "bed_days": 4,
+      "bed_probability": 0.6040472776483617,
+      "distance": 24.421975130787814
+    },
+    {
+      "beta_scale": 10.698436372645817,
+      "latent_days": 0,
+      "prodromal_days": 1,
+      "bed_days": 5,
+      "bed_probability": 0.4606309558975358,
+      "distance": 24.661916308076425
+    },
+    {
+      "beta_scale": 10.741656177190562,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.5349827005009627,
+      "distance": 24.88306848252635
+    },
+    {
+      "beta_scale": 7.109017732642182,
+      "latent_days": 0,
+      "prodromal_days": 2,
+      "bed_days": 4,
+      "bed_probability": 0.5133471745894577,
+      "distance": 25.108227774742677
+    },
+    {
+      "beta_scale": 10.506987023834075,
+      "latent_days": 1,
+      "prodromal_days": 2,
+      "bed_days": 5,
+      "bed_probability": 0.4492955830627423,
+      "distance": 25.109985008293204
+    },
+    {
+      "beta_scale": 8.51090008623511,
+      "latent_days": 1,
+      "prodromal_days": 2,
+      "bed_days": 5,
+      "bed_probability": 0.45762020244262636,
+      "distance": 25.232618897013964
+    },
+    {
+      "beta_scale": 6.960264581312047,
+      "latent_days": 1,
+      "prodromal_days": 1,
+      "bed_days": 5,
+      "bed_probability": 0.42424713069289544,
+      "distance": 25.247808536032988
+    },
+    {
+      "beta_scale": 10.564530878206648,
+      "latent_days": 0,
+      "prodromal_days": 2,
+      "bed_days": 4,
+      "bed_probability": 0.4991346905035841,
+      "distance": 25.36886936054154
+    },
+    {
+      "beta_scale": 10.161593542392975,
+      "latent_days": 1,
+      "prodromal_days": 2,
+      "bed_days": 5,
+      "bed_probability": 0.40250218291451306,
+      "distance": 25.42981355491261
+    },
+    {
+      "beta_scale": 10.546753500366002,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 6,
+      "bed_probability": 0.46722019969661094,
+      "distance": 25.555621570876525
+    },
+    {
+      "beta_scale": 11.276049124254193,
+      "latent_days": 1,
+      "prodromal_days": 2,
+      "bed_days": 5,
+      "bed_probability": 0.3828249374667316,
+      "distance": 25.66957868809123
+    },
+    {
+      "beta_scale": 5.1636865979409,
+      "latent_days": 0,
+      "prodromal_days": 3,
+      "bed_days": 3,
+      "bed_probability": 0.7057884675617498,
+      "distance": 25.84101978894906
+    },
+    {
+      "beta_scale": 6.592289508042806,
+      "latent_days": 0,
+      "prodromal_days": 1,
+      "bed_days": 5,
+      "bed_probability": 0.4248081571126709,
+      "distance": 25.962195556249295
+    },
+    {
+      "beta_scale": 10.614951669281158,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 5,
+      "bed_probability": 0.5535453165526988,
+      "distance": 26.03365051041618
+    },
+    {
+      "beta_scale": 8.951834818972547,
+      "latent_days": 0,
+      "prodromal_days": 1,
+      "bed_days": 5,
+      "bed_probability": 0.3796714413808481,
+      "distance": 26.082576043873033
+    },
+    {
+      "beta_scale": 5.14083506469363,
+      "latent_days": 1,
+      "prodromal_days": 2,
+      "bed_days": 4,
+      "bed_probability": 0.48060424999507584,
+      "distance": 26.19306474139059
+    },
+    {
+      "beta_scale": 10.613138277973771,
+      "latent_days": 0,
+      "prodromal_days": 2,
+      "bed_days": 4,
+      "bed_probability": 0.5534240484470493,
+      "distance": 26.35024394984657
+    },
+    {
+      "beta_scale": 10.302175382355239,
+      "latent_days": 0,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.5131251137505695,
+      "distance": 26.581056505224023
+    },
+    {
+      "beta_scale": 4.906499862781048,
+      "latent_days": 1,
+      "prodromal_days": 1,
+      "bed_days": 5,
+      "bed_probability": 0.4724913036451638,
+      "distance": 26.652575114865538
+    },
+    {
+      "beta_scale": 7.947818259091369,
+      "latent_days": 2,
+      "prodromal_days": 2,
+      "bed_days": 2,
+      "bed_probability": 0.9509081263748718,
+      "distance": 26.783494501587715
+    },
+    {
+      "beta_scale": 11.262002216089176,
+      "latent_days": 0,
+      "prodromal_days": 3,
+      "bed_days": 5,
+      "bed_probability": 0.4947215308704494,
+      "distance": 26.8572051351575
+    },
+    {
+      "beta_scale": 9.535318416100699,
+      "latent_days": 0,
+      "prodromal_days": 3,
+      "bed_days": 3,
+      "bed_probability": 0.6847731604278239,
+      "distance": 26.857532445733966
+    },
+    {
+      "beta_scale": 11.113799740353185,
+      "latent_days": 2,
+      "prodromal_days": 2,
+      "bed_days": 4,
+      "bed_probability": 0.5954769130525204,
+      "distance": 26.930340702586722
+    },
+    {
+      "beta_scale": 2.92488910863738,
+      "latent_days": 1,
+      "prodromal_days": 1,
+      "bed_days": 5,
+      "bed_probability": 0.4668129511854434,
+      "distance": 27.07375902221342
+    },
+    {
+      "beta_scale": 6.979429524157519,
+      "latent_days": 1,
+      "prodromal_days": 2,
+      "bed_days": 4,
+      "bed_probability": 0.4861430856524621,
+      "distance": 27.133786787410298
+    },
+    {
+      "beta_scale": 11.688662334505828,
+      "latent_days": 2,
+      "prodromal_days": 2,
+      "bed_days": 3,
+      "bed_probability": 0.7974536303843878,
+      "distance": 27.19925590065043
+    },
+    {
+      "beta_scale": 11.14773039613628,
+      "latent_days": 1,
+      "prodromal_days": 1,
+      "bed_days": 6,
+      "bed_probability": 0.33481588176901883,
+      "distance": 27.218855286888985
+    },
+    {
+      "beta_scale": 7.81696319556528,
+      "latent_days": 1,
+      "prodromal_days": 2,
+      "bed_days": 5,
+      "bed_probability": 0.4774575739324134,
+      "distance": 27.222063866986776
+    },
+    {
+      "beta_scale": 5.766797496365139,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.5764781952927956,
+      "distance": 27.24324752959964
+    },
+    {
+      "beta_scale": 11.876825901651447,
+      "latent_days": 2,
+      "prodromal_days": 1,
+      "bed_days": 3,
+      "bed_probability": 0.5998346159765432,
+      "distance": 27.33711539344274
+    },
+    {
+      "beta_scale": 5.759883249442988,
+      "latent_days": 1,
+      "prodromal_days": 1,
+      "bed_days": 6,
+      "bed_probability": 0.339588691887146,
+      "distance": 27.435752456011162
+    },
+    {
+      "beta_scale": 5.907184507474272,
+      "latent_days": 0,
+      "prodromal_days": 3,
+      "bed_days": 5,
+      "bed_probability": 0.4963513893613164,
+      "distance": 27.443032648616718
+    },
+    {
+      "beta_scale": 11.049372563079542,
+      "latent_days": 1,
+      "prodromal_days": 2,
+      "bed_days": 4,
+      "bed_probability": 0.5916251121473957,
+      "distance": 27.59918191872379
+    },
+    {
+      "beta_scale": 9.261384993387932,
+      "latent_days": 0,
+      "prodromal_days": 2,
+      "bed_days": 4,
+      "bed_probability": 0.5018831234324012,
+      "distance": 27.626894290121005
+    },
+    {
+      "beta_scale": 8.98343156747674,
+      "latent_days": 0,
+      "prodromal_days": 1,
+      "bed_days": 6,
+      "bed_probability": 0.34318413211538945,
+      "distance": 27.747554138407676
+    },
+    {
+      "beta_scale": 9.820259398577006,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.7050007243496367,
+      "distance": 27.83067011159551
+    },
+    {
+      "beta_scale": 3.7942962170777705,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 5,
+      "bed_probability": 0.5424536012046206,
+      "distance": 27.85704307329247
+    },
+    {
+      "beta_scale": 8.039015920999097,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 3,
+      "bed_probability": 0.7450237248628321,
+      "distance": 27.96359304812159
+    },
+    {
+      "beta_scale": 10.508746403230907,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.6084967904201712,
+      "distance": 27.981952764874432
+    },
+    {
+      "beta_scale": 10.06681746974297,
+      "latent_days": 0,
+      "prodromal_days": 2,
+      "bed_days": 6,
+      "bed_probability": 0.36126983843078203,
+      "distance": 28.193024259208155
+    },
+    {
+      "beta_scale": 6.7497311369477355,
+      "latent_days": 0,
+      "prodromal_days": 2,
+      "bed_days": 4,
+      "bed_probability": 0.47472546414205496,
+      "distance": 28.239150854014735
+    },
+    {
+      "beta_scale": 8.358607617538013,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 5,
+      "bed_probability": 0.47373853894559986,
+      "distance": 28.315659856063075
+    },
+    {
+      "beta_scale": 4.2567694410626125,
+      "latent_days": 1,
+      "prodromal_days": 2,
+      "bed_days": 6,
+      "bed_probability": 0.36432725688356254,
+      "distance": 28.34343894262011
+    },
+    {
+      "beta_scale": 9.215460400611983,
+      "latent_days": 0,
+      "prodromal_days": 1,
+      "bed_days": 4,
+      "bed_probability": 0.4515132790916525,
+      "distance": 28.350585612752273
+    },
+    {
+      "beta_scale": 8.184058418867197,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.6780357227424252,
+      "distance": 28.379335513097043
+    },
+    {
+      "beta_scale": 9.814872413731736,
+      "latent_days": 0,
+      "prodromal_days": 1,
+      "bed_days": 4,
+      "bed_probability": 0.4612460169561514,
+      "distance": 28.430236729455856
+    },
+    {
+      "beta_scale": 6.485292189915989,
+      "latent_days": 0,
+      "prodromal_days": 3,
+      "bed_days": 3,
+      "bed_probability": 0.6814773326774054,
+      "distance": 28.71578689213688
+    },
+    {
+      "beta_scale": 4.9388689875259875,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 5,
+      "bed_probability": 0.5343712131733508,
+      "distance": 28.721649529361144
+    },
+    {
+      "beta_scale": 7.56672604979073,
+      "latent_days": 0,
+      "prodromal_days": 3,
+      "bed_days": 3,
+      "bed_probability": 0.7758734908228412,
+      "distance": 28.84777353725013
+    },
+    {
+      "beta_scale": 3.975039811600712,
+      "latent_days": 1,
+      "prodromal_days": 2,
+      "bed_days": 4,
+      "bed_probability": 0.47530211869081196,
+      "distance": 28.84935104218674
+    },
+    {
+      "beta_scale": 7.3350324059844345,
+      "latent_days": 2,
+      "prodromal_days": 2,
+      "bed_days": 2,
+      "bed_probability": 0.930456640644191,
+      "distance": 28.885778046759143
+    },
+    {
+      "beta_scale": 6.799189309897564,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.7116531216145995,
+      "distance": 28.910084155969333
+    },
+    {
+      "beta_scale": 7.158665538806266,
+      "latent_days": 1,
+      "prodromal_days": 1,
+      "bed_days": 5,
+      "bed_probability": 0.47468813182264463,
+      "distance": 28.976332190220756
+    },
+    {
+      "beta_scale": 2.6923001696235866,
+      "latent_days": 1,
+      "prodromal_days": 2,
+      "bed_days": 4,
+      "bed_probability": 0.5065334340442057,
+      "distance": 29.023676045513138
+    },
+    {
+      "beta_scale": 9.58485407175932,
+      "latent_days": 0,
+      "prodromal_days": 2,
+      "bed_days": 4,
+      "bed_probability": 0.4754103241676777,
+      "distance": 29.030478989314645
+    },
+    {
+      "beta_scale": 6.152777383725887,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 3,
+      "bed_probability": 0.7336871029169526,
+      "distance": 29.101325686167996
+    },
+    {
+      "beta_scale": 10.677441926971849,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.659961185565897,
+      "distance": 29.114196479366296
+    },
+    {
+      "beta_scale": 5.565704668821098,
+      "latent_days": 0,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.5534187978271993,
+      "distance": 29.199480486297436
+    },
+    {
+      "beta_scale": 9.187914459955104,
+      "latent_days": 2,
+      "prodromal_days": 2,
+      "bed_days": 2,
+      "bed_probability": 0.9303948339217016,
+      "distance": 29.36378405265204
+    },
+    {
+      "beta_scale": 6.884084266862822,
+      "latent_days": 0,
+      "prodromal_days": 3,
+      "bed_days": 3,
+      "bed_probability": 0.7299516094898139,
+      "distance": 29.391033802763186
+    },
+    {
+      "beta_scale": 8.377268418541396,
+      "latent_days": 1,
+      "prodromal_days": 1,
+      "bed_days": 6,
+      "bed_probability": 0.36834753928049585,
+      "distance": 29.4013166716706
+    },
+    {
+      "beta_scale": 11.5741714806515,
+      "latent_days": 0,
+      "prodromal_days": 2,
+      "bed_days": 4,
+      "bed_probability": 0.4799018693047262,
+      "distance": 29.580726884719876
+    },
+    {
+      "beta_scale": 10.814997883395927,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 3,
+      "bed_probability": 0.7918090683001153,
+      "distance": 29.64276888422097
+    },
+    {
+      "beta_scale": 6.335785593106452,
+      "latent_days": 1,
+      "prodromal_days": 1,
+      "bed_days": 4,
+      "bed_probability": 0.42619531264015414,
+      "distance": 29.659950247846336
+    },
+    {
+      "beta_scale": 3.177803893170346,
+      "latent_days": 1,
+      "prodromal_days": 2,
+      "bed_days": 5,
+      "bed_probability": 0.49602354653976494,
+      "distance": 29.747635227170946
+    },
+    {
+      "beta_scale": 6.016905645165382,
+      "latent_days": 1,
+      "prodromal_days": 1,
+      "bed_days": 6,
+      "bed_probability": 0.36000885762392676,
+      "distance": 29.82269604148658
+    },
+    {
+      "beta_scale": 4.114469999822355,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.6489573917746039,
+      "distance": 29.861782336342582
+    },
+    {
+      "beta_scale": 9.474129105142886,
+      "latent_days": 2,
+      "prodromal_days": 3,
+      "bed_days": 4,
+      "bed_probability": 0.5683903212975437,
+      "distance": 29.992908596342392
+    },
+    {
+      "beta_scale": 8.31415139650637,
+      "latent_days": 1,
+      "prodromal_days": 1,
+      "bed_days": 4,
+      "bed_probability": 0.46443168902190785,
+      "distance": 30.0157628668014
+    },
+    {
+      "beta_scale": 7.924108337689495,
+      "latent_days": 1,
+      "prodromal_days": 3,
+      "bed_days": 5,
+      "bed_probability": 0.5769023598440525,
+      "distance": 30.048456272425952
+    },
+    {
+      "beta_scale": 10.398061796051444,
+      "latent_days": 1,
+      "prodromal_days": 2,
+      "bed_days": 6,
+      "bed_probability": 0.4075498858961688,
+      "distance": 30.05552488657901
+    },
+    {
+      "beta_scale": 6.889041663680287,
+      "latent_days": 2,
+      "prodromal_days": 2,
+      "bed_days": 4,
+      "bed_probability": 0.616709755263958,
+      "distance": 30.137216254192904
+    },
+    {
+      "beta_scale": 8.00544976998593,
+      "latent_days": 0,
+      "prodromal_days": 2,
+      "bed_days": 6,
+      "bed_probability": 0.39877080493353645,
+      "distance": 30.208949551726622
+    }
+  ]
+}

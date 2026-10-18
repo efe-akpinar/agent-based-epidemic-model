@@ -4,6 +4,8 @@
   "days": 200,
   "seed": 42,
   "ever_infected": 11539,
+  "ever_severe": 5826,
+  "peak_severe": 5212,
   "attack_rate": 0.7693,
   "peak_infected": 8515,
   "peak_day": 8,
@@ -18,6 +20,13 @@
   "r0_peak": 1.716,
   "r0_peak_day": 0,
   "r0_below_one_day": null,
+  "r_seed_cases": 3.198,
+  "r_early": 2.093,
+  "infections_by_route": {
+    "network": 9444,
+    "cafeteria": 1645,
+    "seed": 450
+  },
   "epidemic_day": 6,
   "normalization_day": 197,
   "peak_hospital_occupancy": 560,
@@ -47,6 +56,16 @@
       "q3": 6.0,
       "max": 142
     }
+  },
+  "infected_by_immunity": {
+    "strong": 4466,
+    "normal": 5853,
+    "weak": 1220
+  },
+  "severe_by_immunity": {
+    "strong": 2020,
+    "normal": 2848,
+    "weak": 958
   },
   "deaths_by_immunity": {
     "strong": 1458,
@@ -84,6 +103,7 @@
     "k_neighbors": 8,
     "rewire_prob": 0.1,
     "initial_infected": 0.03,
+    "initial_cases": null,
     "n_tables": 500,
     "max_seats": 6,
     "hospital_beds": 300,
@@ -92,6 +112,18 @@
     "surge_factor": 1.2,
     "death_rate": 0.02,
     "isolation_group_max": 3,
+    "health_loss_per_zeta": 2.5,
+    "min_illness_days": 5,
+    "beta_scale": 1.0,
+    "symptom_isolation": 0.0,
+    "isolation_threshold": null,
+    "isolation_response": true,
+    "progression": "fixed",
+    "severe_progression": [
+      0.3,
+      0.6,
+      0.9
+    ],
     "seed": 42
   },
   "parameters": [

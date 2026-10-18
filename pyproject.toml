@@ -1,9 +1,29 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "epidemic-abm"
-version = "1.0.0"
+version = "2.0.0"
 description = "Symptom-based agent-based epidemic model"
+readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["matplotlib", "networkx", "numpy", "pandas"]
+dependencies = [
+    "matplotlib>=3.7",
+    "networkx>=3.0",
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "rdata>=0.11",
+    "SALib>=1.4",
+    "scipy>=1.10",
+]
+
+[project.optional-dependencies]
+app = ["streamlit>=1.40"]
+dev = ["jupyter", "nbconvert", "pytest>=7", "streamlit>=1.40"]
+
+[tool.setuptools]
+packages = ["epidemic_abm"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

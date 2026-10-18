@@ -1,0 +1,186 @@
+{
+  "school_interventions": [
+    {
+      "intervention": "No intervention",
+      "boys_ill_mean": 388.89,
+      "boys_ill_low": 269.95,
+      "boys_ill_high": 559.5499999999995,
+      "major_outbreak_probability": 0.99,
+      "boys_ill_if_major_median": 371.0,
+      "peak_in_bed_mean": 280.8475,
+      "runs": 400
+    },
+    {
+      "intervention": "Dining hall closed",
+      "boys_ill_mean": 386.4575,
+      "boys_ill_low": 261.95,
+      "boys_ill_high": 561.0,
+      "major_outbreak_probability": 0.985,
+      "boys_ill_if_major_median": 369.0,
+      "peak_in_bed_mean": 230.0225,
+      "runs": 400
+    },
+    {
+      "intervention": "Dining hall at half capacity",
+      "boys_ill_mean": 386.84,
+      "boys_ill_low": 263.0,
+      "boys_ill_high": 563.05,
+      "major_outbreak_probability": 0.985,
+      "boys_ill_if_major_median": 371.0,
+      "peak_in_bed_mean": 279.04,
+      "runs": 400
+    },
+    {
+      "intervention": "Tables of at most 4",
+      "boys_ill_mean": 390.405,
+      "boys_ill_low": 266.95,
+      "boys_ill_high": 558.05,
+      "major_outbreak_probability": 0.9925,
+      "boys_ill_if_major_median": 370.0,
+      "peak_in_bed_mean": 261.9975,
+      "runs": 400
+    },
+    {
+      "intervention": "Hygiene and masks (\u221230% transmission)",
+      "boys_ill_mean": 384.44,
+      "boys_ill_low": 267.9,
+      "boys_ill_high": 563.2999999999997,
+      "major_outbreak_probability": 0.98,
+      "boys_ill_if_major_median": 370.5,
+      "peak_in_bed_mean": 272.6775,
+      "runs": 400
+    },
+    {
+      "intervention": "Isolate at first symptoms (50% a day)",
+      "boys_ill_mean": 202.685,
+      "boys_ill_low": 0.0,
+      "boys_ill_high": 540.05,
+      "major_outbreak_probability": 0.52,
+      "boys_ill_if_major_median": 372.0,
+      "peak_in_bed_mean": 112.7875,
+      "runs": 400
+    },
+    {
+      "intervention": "Half capacity + isolation",
+      "boys_ill_mean": 205.6675,
+      "boys_ill_low": 0.0,
+      "boys_ill_high": 540.1999999999998,
+      "major_outbreak_probability": 0.5375,
+      "boys_ill_if_major_median": 365.0,
+      "peak_in_bed_mean": 114.285,
+      "runs": 400
+    }
+  ],
+  "hospital_capacity": [
+    {
+      "policy": "Isolation when hospitals are full (report)",
+      "beds": 75,
+      "beds_per_1000": 5.0,
+      "deaths_median": 5166.5,
+      "deaths_low": 5026.2,
+      "deaths_high": 5291.8,
+      "max_turned_away_median": 5129.5,
+      "attack_rate_median": 0.7655000000000001,
+      "epidemic_day_median": 6.0
+    },
+    {
+      "policy": "Isolation when hospitals are full (report)",
+      "beds": 150,
+      "beds_per_1000": 10.0,
+      "deaths_median": 5123.5,
+      "deaths_low": 4999.7,
+      "deaths_high": 5278.2,
+      "max_turned_away_median": 5027.0,
+      "attack_rate_median": 0.76675,
+      "epidemic_day_median": 6.0
+    },
+    {
+      "policy": "Isolation when hospitals are full (report)",
+      "beds": 300,
+      "beds_per_1000": 20.0,
+      "deaths_median": 5082.0,
+      "deaths_low": 4936.85,
+      "deaths_high": 5206.7,
+      "max_turned_away_median": 4833.0,
+      "attack_rate_median": 0.7639,
+      "epidemic_day_median": 6.0
+    },
+    {
+      "policy": "Isolation when hospitals are full (report)",
+      "beds": 600,
+      "beds_per_1000": 40.0,
+      "deaths_median": 5388.5,
+      "deaths_low": 5225.8,
+      "deaths_high": 5513.2,
+      "max_turned_away_median": 5027.5,
+      "attack_rate_median": 0.83815,
+      "epidemic_day_median": 7.0
+    },
+    {
+      "policy": "Isolation when hospitals are full (report)",
+      "beds": 1200,
+      "beds_per_1000": 80.0,
+      "deaths_median": 5549.5,
+      "deaths_low": 5428.55,
+      "deaths_high": 5644.35,
+      "max_turned_away_median": 4787.5,
+      "attack_rate_median": 0.89345,
+      "epidemic_day_median": 8.0
+    },
+    {
+      "policy": "No isolation phase",
+      "beds": 75,
+      "beds_per_1000": 5.0,
+      "deaths_median": 6696.5,
+      "deaths_low": 6540.75,
+      "deaths_high": 6759.15,
+      "max_turned_away_median": 6932.5,
+      "attack_rate_median": 1.0,
+      "epidemic_day_median": 6.0
+    },
+    {
+      "policy": "No isolation phase",
+      "beds": 150,
+      "beds_per_1000": 10.0,
+      "deaths_median": 6661.0,
+      "deaths_low": 6538.35,
+      "deaths_high": 6789.2,
+      "max_turned_away_median": 6850.0,
+      "attack_rate_median": 1.0,
+      "epidemic_day_median": 6.0
+    },
+    {
+      "policy": "No isolation phase",
+      "beds": 300,
+      "beds_per_1000": 20.0,
+      "deaths_median": 6617.5,
+      "deaths_low": 6488.95,
+      "deaths_high": 6676.8,
+      "max_turned_away_median": 6673.0,
+      "attack_rate_median": 1.0,
+      "epidemic_day_median": 6.0
+    },
+    {
+      "policy": "No isolation phase",
+      "beds": 600,
+      "beds_per_1000": 40.0,
+      "deaths_median": 6425.5,
+      "deaths_low": 6350.2,
+      "deaths_high": 6525.1,
+      "max_turned_away_median": 6293.5,
+      "attack_rate_median": 1.0,
+      "epidemic_day_median": 7.0
+    },
+    {
+      "policy": "No isolation phase",
+      "beds": 1200,
+      "beds_per_1000": 80.0,
+      "deaths_median": 6224.5,
+      "deaths_low": 6132.65,
+      "deaths_high": 6328.6,
+      "max_turned_away_median": 5570.5,
+      "attack_rate_median": 1.0,
+      "epidemic_day_median": 8.0
+    }
+  ]
+}
